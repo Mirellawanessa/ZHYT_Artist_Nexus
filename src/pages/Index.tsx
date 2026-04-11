@@ -42,12 +42,12 @@ const Index = () => {
         <h1 className="text-lg font-bold tracking-tight text-foreground">FAME & CO. Artist Nexus</h1>
         <div className="absolute left-16 top-24 bottom-48 w-px bg-foreground/20" />
 
-        <div className="flex-1 flex flex-col justify-center pl-12 max-w-2xl">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-foreground mb-12">
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-foreground mb-12 text-center">
             Where Stars Connect<br />and Legends Begin.
           </h2>
 
-          <form onSubmit={handleSubmit} className="border border-foreground/20 rounded-2xl p-8 max-w-lg">
+          <form onSubmit={handleSubmit} className="border border-foreground/20 rounded-2xl p-8 w-full max-w-lg">
             <div className="space-y-6">
               <div>
                 <label className="flex items-center gap-2 text-sm text-foreground mb-2">
@@ -99,24 +99,42 @@ const Index = () => {
               </p>
             </div>
           </form>
-        </div>
 
-        <div className="mt-auto pt-8">
-          <p className="text-sm font-mono text-foreground tracking-widest">FAME & CO. — N-EXIE Entertainment</p>
-          <p className="text-xs text-muted-foreground mt-1">Private and Confidential Platform · All communications are encrypted and protected</p>
-          <p className="text-xs text-muted-foreground">© N-EXIE Entertainment. All rights reserved.</p>
+          <div className="mt-8 text-center">
+            <p className="text-sm font-mono text-foreground tracking-widest">FAME & CO. — N-EXIE Entertainment</p>
+            <p className="text-xs text-muted-foreground mt-1">Private and Confidential Platform · All communications are encrypted and protected</p>
+            <p className="text-xs text-muted-foreground">© N-EXIE Entertainment. All rights reserved.</p>
+          </div>
         </div>
       </div>
 
-      {/* Right Section */}
+      {/* Right Section - N-EXIE between lines */}
       <div className="hidden lg:flex w-64 relative items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 flex justify-between px-4">
-          <div className="w-px bg-foreground h-full" />
-          <div className="w-px bg-foreground h-full" />
-          <div className="w-px bg-foreground h-full" />
+        {/* 4 vertical lines */}
+        <div className="absolute top-0 bottom-0" style={{ left: "20%" }}>
           <div className="w-px bg-foreground h-full" />
         </div>
-        <span className="text-6xl font-serif font-normal text-foreground z-10 tracking-[0.15em]">N-EXIE</span>
+        <div className="absolute top-0 bottom-0" style={{ left: "40%" }}>
+          <div className="w-px bg-foreground h-full" />
+        </div>
+        <div className="absolute top-0 bottom-0" style={{ left: "60%" }}>
+          <div className="w-px bg-foreground h-full" />
+        </div>
+        <div className="absolute top-0 bottom-0" style={{ left: "80%" }}>
+          <div className="w-px bg-foreground h-full" />
+        </div>
+
+        {/* N-EXIE text spanning across lines */}
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="flex text-5xl font-serif font-normal text-foreground">
+            {/* N- between line 1 and line 2 */}
+            <span className="flex items-center justify-center" style={{ width: "20%", position: "absolute", left: "20%" }}>N-</span>
+            {/* EX between line 2 and line 3 */}
+            <span className="flex items-center justify-center" style={{ width: "20%", position: "absolute", left: "40%" }}>EX</span>
+            {/* IE between line 3 and line 4 */}
+            <span className="flex items-center justify-center" style={{ width: "20%", position: "absolute", left: "60%" }}>IE</span>
+          </div>
+        </div>
       </div>
     </div>
   );
