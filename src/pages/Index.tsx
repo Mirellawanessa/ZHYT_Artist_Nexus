@@ -25,6 +25,12 @@ const Index = () => {
         toast({ title: "Account created! Check your email to confirm." });
       }
     } else {
+      if (email !== "andressa.morais@fameandco.ai" || password !== "FAME&CO.Andressa@2026") {
+        toast({ title: "Acesso negado", description: "Estas credenciais não têm permissão para acessar o portal.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
       const { error } = await signIn(email, password);
       if (error) {
         toast({ title: error.message, variant: "destructive" });
@@ -43,7 +49,7 @@ const Index = () => {
         <div className="absolute left-16 top-24 bottom-48 w-px bg-foreground/20" />
 
         <div className="flex-1 flex flex-col items-center justify-center">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-foreground mb-12 text-center">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-foreground mb-12 text-center">
             Where Stars Connect<br />and Legends Begin.
           </h2>
 
@@ -86,13 +92,7 @@ const Index = () => {
                   {loading ? "Loading..." : isSignUp ? "Create Account" : "Access Portal"}
                 </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
-              </button>
+
               <p className="text-xs text-muted-foreground">
                 This is an invite-only platform. If you don't have credentials, contact{" "}
                 <span style={{ color: "hsl(270, 50%, 70%)" }} className="cursor-pointer">FAME & CO.</span> to request access.

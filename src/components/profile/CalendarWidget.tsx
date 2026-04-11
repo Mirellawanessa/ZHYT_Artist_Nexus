@@ -105,81 +105,90 @@ export const CalendarWidget = ({ events, userId, onEventsChange }: CalendarWidge
   const dayEvents = selectedDate ? getEventsForDate(selectedDate) : [];
 
   return (
-    <div className="w-full max-w-xl mx-auto">
-      {/* Month header */}
-      <div className="flex items-center justify-center gap-4 mb-4">
-        <span className="text-2xl font-serif">{MONTH_NAMES[currentMonth]}</span>
-        <button onClick={prevMonth}><ChevronLeft className="h-5 w-5 text-foreground" /></button>
-        <span className="text-2xl font-bold">{currentYear}</span>
-        <button onClick={nextMonth}><ChevronRight className="h-5 w-5 text-foreground" /></button>
-      </div>
-
-      {/* Controls */}
-      <div className="flex items-center justify-center gap-4 mb-4">
-        <div className="flex items-center border border-border rounded-lg overflow-hidden">
-          <button onClick={prevMonth} className="px-3 py-1.5 hover:bg-muted"><ChevronLeft className="h-4 w-4" /></button>
-          <button onClick={goToday} className="px-4 py-1.5 border-x border-border text-sm font-medium hover:bg-muted">Today</button>
-          <button onClick={nextMonth} className="px-3 py-1.5 hover:bg-muted"><ChevronRight className="h-4 w-4" /></button>
-        </div>
-        <div className="flex border border-border rounded-lg overflow-hidden">
-          {VIEWS.map((v) => (
-            <button
-              key={v}
-              onClick={() => setSelectedView(v)}
-              className={`px-3 py-1.5 text-sm font-medium transition-colors ${selectedView === v ? "bg-muted font-bold" : "hover:bg-muted/50"}`}
-            >
-              {v}
+    <div className="w-full">
+      {/* Header Notion-like */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
+        <div className="flex items-center gap-4">
+          <span className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
+            {MONTH_NAMES[currentMonth]} {currentYear}
+          </span>
+          <div className="flex items-center rounded-md border border-input shadow-sm overflow-hidden">
+            <button onClick={prevMonth} className="px-2 py-1.5 hover:bg-muted border-r border-input transition-colors">
+              <ChevronLeft className="h-4 w-4" />
             </button>
-          ))}
+            <button onClick={nextMonth} className="px-2 py-1.5 hover:bg-muted border-r border-input transition-colors">
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            <button onClick={goToday} className="px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors">
+              Today
+            </button>
+          </div>
         </div>
+        <button
+          onClick={() => {
+            if (!selectedDate) setSelectedDate(today.toISOString().split("T")[0]);
+            setShowAddDialog(true);
+          }}
+          className="flex items-center justify-center gap-2 bg-foreground text-background hover:opacity-90 px-3 py-1.5 rounded-md font-medium text-sm transition-opacity shadow-sm whitespace-nowrap"
+        >
+          <Plus className="h-4 w-4" /> New Event
+        </button>
       </div>
 
-      {/* Calendar Grid */}
-      <table className="w-full border-collapse">
-        <thead>
-          <tr>
-            {DAYS.map((d) => (
-              <th key={d} className="py-2 text-sm font-bold text-foreground border border-border">{d}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {Array.from({ length: 6 }).map((_, week) => (
-            <tr key={week}>
-              {calendarDays.slice(week * 7, week * 7 + 7).map((d, i) => {
-                const isToday = d.current && d.day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
-                const dayEvts = getEventsForDate(d.dateStr);
-                const isSelected = selectedDate === d.dateStr;
-                return (
-                  <td
-                    key={i}
-                    onClick={() => handleDayClick(d.dateStr)}
-                    className={`py-2 text-center text-sm border border-border cursor-pointer hover:bg-muted/50 relative ${
-                      d.current ? "text-foreground" : "text-muted-foreground"
-                    } ${isSelected ? "bg-muted" : ""}`}
-                    style={{ minHeight: 48 }}
-                  >
-                    {isToday ? (
-                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full text-background" style={{ backgroundColor: "hsl(210, 80%, 55%)" }}>
-                        {d.day}
-                      </span>
-                    ) : (
-                      d.day
-                    )}
-                    {dayEvts.length > 0 && (
-                      <div className="flex justify-center gap-0.5 mt-0.5">
-                        {dayEvts.slice(0, 3).map((ev) => (
-                          <span key={ev.id} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ev.color }} />
-                        ))}
-                      </div>
-                    )}
-                  </td>
-                );
-              })}
+      {/* Calendar Grid Notion-like */}
+      <div className="bg-card border border-border/50 rounded-xl overflow-hidden shadow-sm">
+        <table className="w-full table-fixed border-collapse">
+          <thead>
+            <tr>
+              {DAYS.map((d) => (
+                <th key={d} className="py-2.5 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground border-b border-border/50 bg-muted/20">
+                  {d}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {Array.from({ length: 6 }).map((_, week) => (
+              <tr key={week}>
+                {calendarDays.slice(week * 7, week * 7 + 7).map((d, i) => {
+                  const isToday = d.current && d.day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+                  const dayEvts = getEventsForDate(d.dateStr);
+                  const isSelected = selectedDate === d.dateStr;
+                  return (
+                    <td
+                      key={i}
+                      onClick={() => handleDayClick(d.dateStr)}
+                      className={`h-24 md:h-32 p-1.5 align-top border-b border-r border-border/50 cursor-pointer hover:bg-muted/30 transition-colors ${i === 6 ? "border-r-0" : ""} ${!d.current ? "bg-muted/10 opacity-50" : ""} ${isSelected ? "ring-2 ring-foreground/20 ring-inset bg-muted/20" : ""}`}
+                    >
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="opacity-0"></span>
+                        <div className={`text-[11px] font-medium w-6 h-6 flex items-center justify-center rounded-full ${isToday ? "bg-destructive text-destructive-foreground font-bold" : "text-foreground"} ${!d.current && !isToday ? "text-muted-foreground" : ""}`}>
+                          {d.day}
+                        </div>
+                      </div>
+                      <div className="space-y-[2px] overflow-hidden">
+                        {dayEvts.slice(0, 3).map((ev) => (
+                          <div
+                            key={ev.id}
+                            className="text-[10px] sm:text-xs truncate px-1.5 py-0.5 rounded transition-opacity"
+                            style={{ backgroundColor: ev.color + "20", color: ev.color, borderLeft: `2px solid ${ev.color}` }}
+                            title={ev.title}
+                          >
+                            {ev.title}
+                          </div>
+                        ))}
+                        {dayEvts.length > 3 && (
+                          <div className="text-[10px] text-muted-foreground font-medium px-1">+{dayEvts.length - 3} mais</div>
+                        )}
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Selected day events panel */}
       {selectedDate && (

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Settings, MessageCircle } from "lucide-react";
+import { Settings, MessageCircle, FileText, Folder, TrendingUp, Bot, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,11 +9,10 @@ import { CalendarWidget } from "@/components/profile/CalendarWidget";
 import { FlipClock } from "@/components/profile/FlipClock";
 
 const accessItems = [
-  { emoji: "🏰", label: "Command Center" },
-  { emoji: "📁", label: "Contracts & Documents" },
-  { emoji: "📂", label: "File Vault" },
-  { emoji: "📊", label: "Career Strategy" },
-  { emoji: "🤖", label: "AI Persona Development" },
+  { icon: FileText, label: "Contracts & Documents" },
+  { icon: Folder, label: "File Vault" },
+  { icon: TrendingUp, label: "Career Strategy" },
+  { icon: Bot, label: "AI Persona Development" },
 ];
 
 interface Photo {
@@ -37,6 +36,8 @@ const Profile = () => {
   const [displayName, setDisplayName] = useState("User");
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate("/");
@@ -83,8 +84,35 @@ const Profile = () => {
       fetchProfile();
       fetchPhotos();
       fetchEvents();
+      setAvatarUrl(user.user_metadata?.avatar_url || null);
     }
   }, [user, fetchProfile, fetchPhotos, fetchEvents]);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setUploadingAvatar(true);
+    
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage.from("gallery").upload(path, file);
+    if (!uploadError) {
+      const { data: { publicUrl } } = supabase.storage.from("gallery").getPublicUrl(path);
+      await supabase.auth.updateUser({ data: { avatar_url: publicUrl } });
+      setAvatarUrl(publicUrl);
+    }
+    setUploadingAvatar(false);
+  };
+
+  const handleAvatarRemove = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    setUploadingAvatar(true);
+    await supabase.auth.updateUser({ data: { avatar_url: null } });
+    setAvatarUrl(null);
+    setUploadingAvatar(false);
+  };
 
   if (loading || !user) return null;
 
@@ -93,7 +121,29 @@ const Profile = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-muted" />
+          <div className="relative">
+            <label className="relative cursor-pointer w-14 h-14 rounded-full overflow-hidden bg-muted group flex items-center justify-center">
+              <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploadingAvatar} />
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-2xl">👤</span>
+              )}
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-white text-xs font-semibold">{uploadingAvatar ? "..." : "Edit"}</span>
+              </div>
+            </label>
+            {avatarUrl && (
+              <button
+                onClick={handleAvatarRemove}
+                disabled={uploadingAvatar}
+                className="absolute -top-1 -right-1 w-5 h-5 bg-background shadow-sm border border-border rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors z-10"
+                title="Remove photo"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
           <EditableName name={displayName} userId={user.id} onNameChange={setDisplayName} />
         </div>
         <div className="flex items-center gap-3">
@@ -108,18 +158,23 @@ const Profile = () => {
         <p className="text-foreground"><span className="font-bold">Division:</span> N-EXIE Creators</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Column */}
-        <div className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        {/* Left Column - Clock & Accesses */}
+        <div className="space-y-6">
           <FlipClock />
-          <div>
-            <div className="rounded-t-lg px-4 py-3" style={{ backgroundColor: "hsl(220, 30%, 90%)" }}>
-              <h2 className="text-2xl font-bold text-foreground">Accesses</h2>
+          <div className="border border-border/50 rounded-lg overflow-hidden shadow-sm bg-card max-w-sm">
+            <div className="bg-muted/30 px-3 py-2 border-b border-border/50">
+              <h2 className="text-sm font-semibold text-foreground">Accesses</h2>
             </div>
-            <div className="space-y-3 mt-4">
+            <div className="p-2 space-y-1">
               {accessItems.map((item) => (
-                <div key={item.label} className="flex items-center gap-3 text-foreground cursor-pointer hover:opacity-70 transition-opacity">
-                  <span className="text-lg">{item.emoji}</span>
+                <div 
+                  key={item.label} 
+                  onClick={() => {
+                    if (item.label === "Contracts & Documents") navigate("/contracts");
+                  }}
+                  className="flex items-center gap-2.5 text-sm text-foreground cursor-pointer hover:bg-muted/50 px-2 py-1.5 rounded-md transition-colors"
+                >
                   <span className="font-medium">{item.label}</span>
                 </div>
               ))}
@@ -127,11 +182,15 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Right Column */}
+        {/* Right Column - Gallery */}
         <div className="space-y-8">
           <Gallery photos={photos} userId={user.id} onPhotosChange={fetchPhotos} />
-          <CalendarWidget events={events} userId={user.id} onEventsChange={fetchEvents} />
         </div>
+      </div>
+
+      {/* Bottom Section - Calendar */}
+      <div className="w-full">
+        <CalendarWidget events={events} userId={user.id} onEventsChange={fetchEvents} />
       </div>
 
       {/* Chat FAB */}
