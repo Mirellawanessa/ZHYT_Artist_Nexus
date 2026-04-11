@@ -109,14 +109,14 @@ const Index = () => {
       </div>
 
       {/* Right Section */}
-      <div className="hidden lg:flex w-80 relative items-center justify-center">
-        <div className="absolute inset-y-0 flex gap-8">
+      <div className="hidden lg:flex w-64 relative items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 flex justify-between px-4">
           <div className="w-px bg-foreground h-full" />
           <div className="w-px bg-foreground h-full" />
           <div className="w-px bg-foreground h-full" />
           <div className="w-px bg-foreground h-full" />
         </div>
-        <span className="text-6xl font-serif font-normal text-foreground z-10 tracking-wider">N-EXIE</span>
+        <span className="text-6xl font-serif font-normal text-foreground z-10 tracking-[0.15em]">N-EXIE</span>
       </div>
     </div>
   );
