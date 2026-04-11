@@ -109,30 +109,19 @@ const Index = () => {
       </div>
 
       {/* Right Section - N-EXIE between lines */}
-      <div className="hidden lg:flex w-64 relative items-center justify-center overflow-hidden">
-        {/* 4 vertical lines */}
-        <div className="absolute top-0 bottom-0" style={{ left: "20%" }}>
-          <div className="w-px bg-foreground h-full" />
-        </div>
-        <div className="absolute top-0 bottom-0" style={{ left: "40%" }}>
-          <div className="w-px bg-foreground h-full" />
-        </div>
-        <div className="absolute top-0 bottom-0" style={{ left: "60%" }}>
-          <div className="w-px bg-foreground h-full" />
-        </div>
-        <div className="absolute top-0 bottom-0" style={{ left: "80%" }}>
-          <div className="w-px bg-foreground h-full" />
-        </div>
+      <div className="hidden lg:block w-48 relative">
+        {/* 4 vertical lines evenly spaced */}
+        <div className="absolute inset-y-0 left-0 w-px bg-foreground" />
+        <div className="absolute inset-y-0 left-1/3 w-px bg-foreground" />
+        <div className="absolute inset-y-0 left-2/3 w-px bg-foreground" />
+        <div className="absolute inset-y-0 right-0 w-px bg-foreground" />
 
-        {/* N-EXIE text spanning across lines */}
-        <div className="absolute inset-0 flex items-center justify-center z-10">
-          <div className="flex text-5xl font-serif font-normal text-foreground">
-            {/* N- between line 1 and line 2 */}
-            <span className="flex items-center justify-center" style={{ width: "20%", position: "absolute", left: "20%" }}>N-</span>
-            {/* EX between line 2 and line 3 */}
-            <span className="flex items-center justify-center" style={{ width: "20%", position: "absolute", left: "40%" }}>EX</span>
-            {/* IE between line 3 and line 4 */}
-            <span className="flex items-center justify-center" style={{ width: "20%", position: "absolute", left: "60%" }}>IE</span>
+        {/* N-EXIE text centered vertically, each pair between lines */}
+        <div className="absolute inset-0 flex items-center z-10">
+          <div className="w-full flex text-5xl font-serif text-foreground">
+            <span className="flex-1 text-center">N-</span>
+            <span className="flex-1 text-center">EX</span>
+            <span className="flex-1 text-center">IE</span>
           </div>
         </div>
       </div>
