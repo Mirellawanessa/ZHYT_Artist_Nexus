@@ -25,15 +25,29 @@ const Index = () => {
         toast({ title: "Account created! Check your email to confirm." });
       }
     } else {
-      if (email !== "andressa.morais@fameandco.ai" || password !== "FAME&CO.Andressa@2026") {
+      if (email !== "ryu.soomin@zhyt.com" || password !== "ZHYT.rmin.AXS") {
         toast({ title: "Acesso negado", description: "Estas credenciais não têm permissão para acessar o portal.", variant: "destructive" });
         setLoading(false);
         return;
       }
 
-      const { error } = await signIn(email, password);
+      let { error } = await signIn(email, password);
+      
       if (error) {
-        toast({ title: error.message, variant: "destructive" });
+        // Se der erro de login (provavelmente usuário não existe), tenta criar a conta
+        const signUpRes = await signUp(email, password);
+        if (!signUpRes.error) {
+          toast({ title: "Conta registrada com sucesso! Fazendo login..." });
+          // Tenta logar de novo
+          const signInRes = await signIn(email, password);
+          error = signInRes.error;
+        } else {
+          error = signUpRes.error;
+        }
+      }
+
+      if (error) {
+        toast({ title: String(error.message || "Erro desconhecido"), variant: "destructive" });
       } else {
         navigate("/welcome");
       }
@@ -45,7 +59,7 @@ const Index = () => {
     <div className="flex min-h-screen bg-background">
       {/* Left Section */}
       <div className="flex-1 flex flex-col px-8 py-6 relative">
-        <h1 className="text-lg font-bold tracking-tight text-foreground">FAME & CO. Artist Nexus</h1>
+        <h1 className="text-lg font-bold tracking-tight text-foreground">ZHYT Artist Nexus</h1>
         <div className="absolute left-16 top-24 bottom-48 w-px bg-foreground/20" />
 
         <div className="flex-1 flex flex-col items-center justify-center">
@@ -95,13 +109,13 @@ const Index = () => {
 
               <p className="text-xs text-muted-foreground">
                 This is an invite-only platform. If you don't have credentials, contact{" "}
-                <span style={{ color: "hsl(270, 50%, 70%)" }} className="cursor-pointer">FAME & CO.</span> to request access.
+                <span style={{ color: "hsl(270, 50%, 70%)" }} className="cursor-pointer">ZHYT</span> to request access.
               </p>
             </div>
           </form>
 
           <div className="mt-8 text-center">
-            <p className="text-sm font-mono text-foreground tracking-widest">FAME & CO. — N-EXIE Entertainment</p>
+            <p className="text-sm font-mono text-foreground tracking-widest">ZHYT — N-EXIE Entertainment</p>
             <p className="text-xs text-muted-foreground mt-1">Private and Confidential Platform · All communications are encrypted and protected</p>
             <p className="text-xs text-muted-foreground">© N-EXIE Entertainment. All rights reserved.</p>
           </div>

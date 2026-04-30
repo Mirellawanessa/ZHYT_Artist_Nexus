@@ -49,7 +49,7 @@ const Welcome = () => {
             transform: showSubtext ? "translateX(0)" : "translateX(-40px)",
           }}
         >
-          Your journey with FAME & CO. begins here.
+          Your journey with ZHYT begins here.
         </p>
       </div>
     </div>
