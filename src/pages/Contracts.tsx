@@ -10,6 +10,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import AIOperatedContract from "@/components/contracts/AIOperatedContract";
+import AIIdentityConsentForm from "@/components/contracts/AIIdentityConsentForm";
+import NonDisclosureAgreement from "@/components/contracts/NonDisclosureAgreement";
+import DigitalSignatureAuthorization from "@/components/contracts/DigitalSignatureAuthorization";
 
 interface Contract {
   id: string;
@@ -117,11 +120,9 @@ const Contracts = () => {
   };
 
   const handleActionClick = (contract: Contract) => {
-    if (contract.title === "AI-Operated Human Artist Contract" && contract.action !== "View") {
+    if (contract.title !== "Welcome & Onboarding Pack") {
       setSelectedContract(contract);
       setShowSignModal(true);
-    } else {
-      toast("Ação não disponível no momento para este documento.");
     }
   };
 
@@ -324,45 +325,61 @@ const Contracts = () => {
           </DialogHeader>
           
           <div className="flex-1 overflow-y-auto max-h-[60vh] my-4 rounded-md">
-            {selectedContract?.title === "AI-Operated Human Artist Contract" ? (
-              <AIOperatedContract />
-            ) : (
+            {selectedContract?.title === "AI-Operated Human Artist Contract" && <AIOperatedContract />}
+            {selectedContract?.title === "Non-Disclosure Agreement (NDA)" && <NonDisclosureAgreement />}
+            {selectedContract?.title === "AI Identity Consent Form" && <AIIdentityConsentForm />}
+            {selectedContract?.title === "Digital Signature Authorization" && <DigitalSignatureAuthorization />}
+            {![
+              "AI-Operated Human Artist Contract",
+              "Non-Disclosure Agreement (NDA)",
+              "AI Identity Consent Form",
+              "Digital Signature Authorization"
+            ].includes(selectedContract?.title || "") && (
               <div className="flex items-center justify-center h-full min-h-[400px] bg-muted/30 border border-border text-muted-foreground rounded-md">
                 Conteúdo do contrato não disponível.
               </div>
             )}
           </div>
 
-          <DialogFooter className="flex flex-col sm:flex-row gap-4 items-end sm:items-center">
-            <div className="flex flex-col gap-3 flex-1 w-full">
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="terms" 
-                  checked={agreedToTerms} 
-                  onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} 
-                />
-                <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Li e concordo com os termos do contrato.
-                </Label>
+          {!selectedContract?.status.includes("Signed on") ? (
+            <DialogFooter className="flex flex-col sm:flex-row gap-4 items-end sm:items-center">
+              <div className="flex flex-col gap-3 flex-1 w-full">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="terms" 
+                    checked={agreedToTerms} 
+                    onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} 
+                  />
+                  <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Li e concordo com os termos do contrato.
+                  </Label>
+                </div>
+                <div className="flex gap-3">
+                  <Input 
+                    placeholder="Digite seu nome completo como assinatura..." 
+                    value={signatureName}
+                    onChange={(e) => setSignatureName(e.target.value)}
+                    className="flex-1"
+                  />
+                </div>
               </div>
-              <div className="flex gap-3">
-                <Input 
-                  placeholder="Digite seu nome completo como assinatura..." 
-                  value={signatureName}
-                  onChange={(e) => setSignatureName(e.target.value)}
-                  className="flex-1"
-                />
+              
+              <Button 
+                onClick={handleSignContract} 
+                disabled={!agreedToTerms || !signatureName.trim() || isSigning}
+                className="w-full sm:w-auto"
+              >
+                {isSigning ? "Assinando..." : "Assinar Contrato"}
+              </Button>
+            </DialogFooter>
+          ) : (
+            <DialogFooter>
+              <div className="w-full text-center text-sm text-green-700 font-semibold p-4 bg-green-50 rounded-md border border-green-200 flex items-center justify-center gap-2">
+                <CheckCircle2 className="w-5 h-5" />
+                Documento {selectedContract.status.toLowerCase()}
               </div>
-            </div>
-            
-            <Button 
-              onClick={handleSignContract} 
-              disabled={!agreedToTerms || !signatureName.trim() || isSigning}
-              className="w-full sm:w-auto"
-            >
-              {isSigning ? "Assinando..." : "Assinar Contrato"}
-            </Button>
-          </DialogFooter>
+            </DialogFooter>
+          )}
         </DialogContent>
       </Dialog>
     </div>
