@@ -199,7 +199,8 @@ const Profile = () => {
               Always learning, always creating. My energy comes from the people I surround myself with. I value honesty, trust, and a good balance between social connection and recharge time. Blue, black, and white that's me. Let's keep growing together.
             </p>
             
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 relative">
+              <HeartIcon className="absolute -top-8 -right-4 w-14 h-14 opacity-90 -rotate-12 pointer-events-none" />
               <img src={nexieLogo} alt="N-EXIE logo" className="w-8 h-8 object-contain" />
               <div className="text-xs text-[#2a2a2a] font-sans space-y-1">
                 <p><span className="font-bold">Program:</span> AI-Operated Human Artist</p>
