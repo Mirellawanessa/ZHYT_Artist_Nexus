@@ -47,6 +47,42 @@ export type Database = {
         }
         Relationships: []
       }
+      contracts: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          signature_name: string | null
+          signed_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          signature_name?: string | null
+          signed_at?: string | null
+          status: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          signature_name?: string | null
+          signed_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       gallery_photos: {
         Row: {
           created_at: string
@@ -73,6 +109,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
           created_at: string
           display_name: string
           id: string
@@ -80,6 +118,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           display_name?: string
           id?: string
@@ -87,6 +127,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           display_name?: string
           id?: string

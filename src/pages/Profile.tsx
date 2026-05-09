@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { HeartIcon, SquigglyLineBottom, SquigglyLineTop, SparkBurst } from "@/components/profile/DecorativeSVGs";
+import nexieLogo from "@/assets/nexie-logo.png";
 
 const mockFriends = [
   "https://i.pravatar.cc/150?img=1",
@@ -45,27 +46,27 @@ const Profile = () => {
     if (!user) return;
     const { data } = await supabase
       .from("profiles")
-      .select("display_name")
+      .select("display_name, bio, avatar_url")
       .eq("user_id", user.id)
       .single();
-      
-    if (data && data.display_name !== "User") {
-      setDisplayName(data.display_name);
-      setEditNameValue(data.display_name);
+
+    if (data) {
+      if (data.display_name && data.display_name !== "User") {
+        setDisplayName(data.display_name);
+        setEditNameValue(data.display_name);
+      }
+      if (data.bio) {
+        setBio(data.bio);
+        setEditBioValue(data.bio);
+      }
+      if (data.avatar_url) {
+        setAvatarUrl(data.avatar_url);
+      }
     }
   }, [user]);
 
   useEffect(() => {
-    if (user) {
-      fetchProfile();
-      if (user.user_metadata?.avatar_url) {
-        setAvatarUrl(user.user_metadata.avatar_url);
-      }
-      if (user.user_metadata?.biography) {
-        setBio(user.user_metadata.biography);
-        setEditBioValue(user.user_metadata.biography);
-      }
-    }
+    if (user) fetchProfile();
   }, [user, fetchProfile]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,13 +75,17 @@ const Profile = () => {
     setUploadingAvatar(true);
     const ext = file.name.split(".").pop();
     const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-    
+
     const { error: uploadError } = await supabase.storage.from("gallery").upload(path, file);
     if (!uploadError) {
       const { data: { publicUrl } } = supabase.storage.from("gallery").getPublicUrl(path);
-      await supabase.auth.updateUser({ data: { avatar_url: publicUrl } });
-      setAvatarUrl(publicUrl);
-      toast({ title: "Profile photo updated successfully!" });
+      const { error: dbError } = await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("user_id", user.id);
+      if (dbError) {
+        toast({ title: "Error saving photo", variant: "destructive" });
+      } else {
+        setAvatarUrl(publicUrl);
+        toast({ title: "Profile photo updated successfully!" });
+      }
     } else {
       toast({ title: "Error uploading photo", variant: "destructive" });
     }
@@ -101,7 +106,7 @@ const Profile = () => {
 
   const saveBio = async () => {
     if (!user) return;
-    const { error } = await supabase.auth.updateUser({ data: { biography: editBioValue.trim() } });
+    const { error } = await supabase.from("profiles").update({ bio: editBioValue.trim() }).eq("user_id", user.id);
     if (error) {
       toast({ title: "Error saving biography", variant: "destructive" });
     } else {
@@ -119,21 +124,23 @@ const Profile = () => {
         
         {/* Decorative SVGs */}
         <SquigglyLineTop className="absolute top-[100px] left-[650px] w-64 h-32 opacity-80" />
-        <HeartIcon className="absolute top-[180px] left-[600px] w-20 h-20 opacity-90 -rotate-12" />
         <SquigglyLineBottom className="absolute bottom-[200px] right-[400px] w-32 h-16 opacity-80" />
         <SparkBurst className="absolute top-[500px] right-[150px] w-16 h-16 opacity-80" />
 
         {/* Top Left Profile Card */}
         <div className="absolute top-8 left-8 bg-[#e0e0e0] rounded-[2.5rem] p-8 w-[600px] h-[380px] flex shadow-sm z-10">
           {/* Avatar */}
-          <div className="relative w-[200px] h-[240px] rounded-3xl overflow-hidden border-4 border-white shrink-0 shadow-md bg-white group">
-            <img src={avatarUrl || ""} alt="Avatar" className="w-full h-full object-cover" />
-            <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+          <div className="relative w-[200px] h-[240px] rounded-3xl border-4 border-white shrink-0 shadow-md bg-white group">
+            <HeartIcon className="absolute -top-10 -right-8 w-16 h-16 opacity-90 -rotate-12 z-20 pointer-events-none" />
+            <div className="w-full h-full rounded-2xl overflow-hidden">
+              <img src={avatarUrl || ""} alt="Avatar" className="w-full h-full object-cover" />
+            </div>
+            <label className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
               <span className="text-white font-semibold text-sm">{uploadingAvatar ? "Uploading..." : "Change Photo"}</span>
               <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploadingAvatar} />
             </label>
           </div>
-          
+
           {/* Info */}
           <div className="ml-8 mt-2 flex flex-col w-full">
             {isEditingName ? (
@@ -182,7 +189,7 @@ const Profile = () => {
             </p>
             
             <div className="flex items-start gap-4">
-              <span className="font-bold text-2xl font-serif">Z</span>
+              <img src={nexieLogo} alt="N-EXIE logo" className="w-8 h-8 object-contain" />
               <div className="text-xs text-[#2a2a2a] font-sans space-y-1">
                 <p><span className="font-bold">Program:</span> AI-Operated Human Artist</p>
                 <p><span className="font-bold">Division:</span> N-EXIE Creators</p>
