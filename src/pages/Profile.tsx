@@ -46,27 +46,27 @@ const Profile = () => {
     if (!user) return;
     const { data } = await supabase
       .from("profiles")
-      .select("display_name")
+      .select("display_name, bio, avatar_url")
       .eq("user_id", user.id)
       .single();
-      
-    if (data && data.display_name !== "User") {
-      setDisplayName(data.display_name);
-      setEditNameValue(data.display_name);
+
+    if (data) {
+      if (data.display_name && data.display_name !== "User") {
+        setDisplayName(data.display_name);
+        setEditNameValue(data.display_name);
+      }
+      if (data.bio) {
+        setBio(data.bio);
+        setEditBioValue(data.bio);
+      }
+      if (data.avatar_url) {
+        setAvatarUrl(data.avatar_url);
+      }
     }
   }, [user]);
 
   useEffect(() => {
-    if (user) {
-      fetchProfile();
-      if (user.user_metadata?.avatar_url) {
-        setAvatarUrl(user.user_metadata.avatar_url);
-      }
-      if (user.user_metadata?.biography) {
-        setBio(user.user_metadata.biography);
-        setEditBioValue(user.user_metadata.biography);
-      }
-    }
+    if (user) fetchProfile();
   }, [user, fetchProfile]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,13 +75,17 @@ const Profile = () => {
     setUploadingAvatar(true);
     const ext = file.name.split(".").pop();
     const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-    
+
     const { error: uploadError } = await supabase.storage.from("gallery").upload(path, file);
     if (!uploadError) {
       const { data: { publicUrl } } = supabase.storage.from("gallery").getPublicUrl(path);
-      await supabase.auth.updateUser({ data: { avatar_url: publicUrl } });
-      setAvatarUrl(publicUrl);
-      toast({ title: "Profile photo updated successfully!" });
+      const { error: dbError } = await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("user_id", user.id);
+      if (dbError) {
+        toast({ title: "Error saving photo", variant: "destructive" });
+      } else {
+        setAvatarUrl(publicUrl);
+        toast({ title: "Profile photo updated successfully!" });
+      }
     } else {
       toast({ title: "Error uploading photo", variant: "destructive" });
     }
@@ -102,7 +106,7 @@ const Profile = () => {
 
   const saveBio = async () => {
     if (!user) return;
-    const { error } = await supabase.auth.updateUser({ data: { biography: editBioValue.trim() } });
+    const { error } = await supabase.from("profiles").update({ bio: editBioValue.trim() }).eq("user_id", user.id);
     if (error) {
       toast({ title: "Error saving biography", variant: "destructive" });
     } else {
