@@ -223,21 +223,40 @@ const Profile = () => {
         </div>
 
         {/* For this week (Middle Right) */}
-        <div className="absolute top-[200px] right-8 z-10">
+        <div className="absolute top-[200px] right-8 z-10 w-[600px]">
           <div className="flex justify-between items-center mb-6 px-4">
             <h2 className="text-2xl font-bold font-serif text-[#1a1a1a]">For this week</h2>
-            <button className="bg-[#dcdcdc] px-4 py-1.5 rounded-full text-sm font-semibold text-[#1a1a1a] hover:bg-gray-300 transition-colors font-sans ml-12">
-              view all
+            <button
+              onClick={async () => {
+                for (let i = 0; i < weekPhotos.length; i++) {
+                  const res = await fetch(weekPhotos[i]);
+                  const blob = await res.blob();
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `for-this-week-${i + 1}.${blob.type.split("/")[1] || "jpg"}`;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                  URL.revokeObjectURL(url);
+                }
+              }}
+              className="bg-[#dcdcdc] px-4 py-1.5 rounded-full text-sm font-semibold text-[#1a1a1a] hover:bg-gray-300 transition-colors font-sans ml-12 flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" /> Download all
             </button>
           </div>
-          <div className="flex items-center gap-4">
-            <ChevronLeft className="w-6 h-6 text-[#1a1a1a] cursor-pointer" />
-            {mockGallery.map((img, i) => (
-              <div key={i} className="w-[120px] h-[150px] rounded-2xl overflow-hidden shadow-md">
-                <img src={img} alt={`Gallery ${i}`} className="w-full h-full object-cover" />
-              </div>
+          <div className="flex items-center gap-3 overflow-x-auto pb-2">
+            {weekPhotos.map((img, i) => (
+              <a
+                key={i}
+                href={img}
+                download={`for-this-week-${i + 1}.jpg`}
+                className="shrink-0 w-[120px] h-[150px] rounded-2xl overflow-hidden shadow-md block"
+              >
+                <img src={img} alt={`Week photo ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform" />
+              </a>
             ))}
-            <ChevronRight className="w-6 h-6 text-[#1a1a1a] cursor-pointer" />
           </div>
         </div>
 
