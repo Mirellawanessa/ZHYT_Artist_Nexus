@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Bell, ChevronLeft, ChevronRight, Play, SkipBack, SkipForward, AlertCircle, Pencil, Check, X } from "lucide-react";
+import { Bell, ChevronLeft, ChevronRight, Play, SkipBack, SkipForward, AlertCircle, Pencil, Check, X, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
