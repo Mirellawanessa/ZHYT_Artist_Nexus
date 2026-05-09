@@ -16,17 +16,14 @@ import weekPhoto7 from "@/assets/week/photo7.png";
 import weekPhoto8 from "@/assets/week/photo8.png";
 import weekPhoto9 from "@/assets/week/photo9.png";
 import weekPhoto10 from "@/assets/week/photo10.png";
+import friend1 from "@/assets/friends/friend1.png";
+import friend2 from "@/assets/friends/friend2.png";
+import friend3 from "@/assets/friends/friend3.png";
+import friend4 from "@/assets/friends/friend4.png";
 
 const weekPhotos = [weekPhoto1, weekPhoto2, weekPhoto3, weekPhoto4, weekPhoto5, weekPhoto6, weekPhoto7, weekPhoto8, weekPhoto9, weekPhoto10];
 
-const mockFriends = [
-  "https://i.pravatar.cc/150?img=1",
-  "https://i.pravatar.cc/150?img=11",
-  "https://i.pravatar.cc/150?img=12",
-  "https://i.pravatar.cc/150?img=20",
-  "https://i.pravatar.cc/150?img=33",
-  "https://i.pravatar.cc/150?img=47",
-];
+const mockFriends = [friend1, friend2, friend3, friend4];
 
 const mockGallery = [
   "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
