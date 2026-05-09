@@ -16,17 +16,14 @@ import weekPhoto7 from "@/assets/week/photo7.png";
 import weekPhoto8 from "@/assets/week/photo8.png";
 import weekPhoto9 from "@/assets/week/photo9.png";
 import weekPhoto10 from "@/assets/week/photo10.png";
+import friend1 from "@/assets/friends/friend1.png";
+import friend2 from "@/assets/friends/friend2.png";
+import friend3 from "@/assets/friends/friend3.png";
+import friend4 from "@/assets/friends/friend4.png";
 
 const weekPhotos = [weekPhoto1, weekPhoto2, weekPhoto3, weekPhoto4, weekPhoto5, weekPhoto6, weekPhoto7, weekPhoto8, weekPhoto9, weekPhoto10];
 
-const mockFriends = [
-  "https://i.pravatar.cc/150?img=1",
-  "https://i.pravatar.cc/150?img=11",
-  "https://i.pravatar.cc/150?img=12",
-  "https://i.pravatar.cc/150?img=20",
-  "https://i.pravatar.cc/150?img=33",
-  "https://i.pravatar.cc/150?img=47",
-];
+const mockFriends = [friend1, friend2, friend3, friend4];
 
 const mockGallery = [
   "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
@@ -46,6 +43,8 @@ const Profile = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [weekIndex, setWeekIndex] = useState(0);
+  const visibleCount = 4;
   
   const [editNameValue, setEditNameValue] = useState(displayName);
   const [editBioValue, setEditBioValue] = useState(bio);
@@ -227,36 +226,36 @@ const Profile = () => {
           <div className="flex justify-between items-center mb-6 px-4">
             <h2 className="text-2xl font-bold font-serif text-[#1a1a1a]">For this week</h2>
             <button
-              onClick={async () => {
-                for (let i = 0; i < weekPhotos.length; i++) {
-                  const res = await fetch(weekPhotos[i]);
-                  const blob = await res.blob();
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = `for-this-week-${i + 1}.${blob.type.split("/")[1] || "jpg"}`;
-                  document.body.appendChild(a);
-                  a.click();
-                  a.remove();
-                  URL.revokeObjectURL(url);
-                }
-              }}
-              className="bg-[#dcdcdc] px-4 py-1.5 rounded-full text-sm font-semibold text-[#1a1a1a] hover:bg-gray-300 transition-colors font-sans ml-12 flex items-center gap-2"
+              onClick={() => toast({ title: "Viewing all photos" })}
+              className="bg-[#dcdcdc] px-4 py-1.5 rounded-full text-sm font-semibold text-[#1a1a1a] hover:bg-gray-300 transition-colors font-sans ml-12"
             >
-              <Download className="w-4 h-4" /> Download all
+              View all
             </button>
           </div>
-          <div className="flex items-center gap-3 overflow-x-auto pb-2">
-            {weekPhotos.map((img, i) => (
-              <a
-                key={i}
-                href={img}
-                download={`for-this-week-${i + 1}.jpg`}
-                className="shrink-0 w-[120px] h-[150px] rounded-2xl overflow-hidden shadow-md block"
-              >
-                <img src={img} alt={`Week photo ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform" />
-              </a>
-            ))}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setWeekIndex((i) => Math.max(0, i - 1))}
+              disabled={weekIndex === 0}
+              className="shrink-0 w-8 h-8 rounded-full bg-[#dcdcdc] hover:bg-gray-300 disabled:opacity-40 flex items-center justify-center transition-colors"
+              aria-label="Previous"
+            >
+              <ChevronLeft className="w-4 h-4 text-[#1a1a1a]" />
+            </button>
+            <div className="flex items-center gap-3 flex-1">
+              {weekPhotos.slice(weekIndex, weekIndex + visibleCount).map((img, i) => (
+                <div key={weekIndex + i} className="shrink-0 w-[120px] h-[150px] rounded-2xl overflow-hidden shadow-md">
+                  <img src={img} alt={`Week photo ${weekIndex + i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform" />
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setWeekIndex((i) => Math.min(weekPhotos.length - visibleCount, i + 1))}
+              disabled={weekIndex >= weekPhotos.length - visibleCount}
+              className="shrink-0 w-8 h-8 rounded-full bg-[#dcdcdc] hover:bg-gray-300 disabled:opacity-40 flex items-center justify-center transition-colors"
+              aria-label="Next"
+            >
+              <ChevronRight className="w-4 h-4 text-[#1a1a1a]" />
+            </button>
           </div>
         </div>
 
