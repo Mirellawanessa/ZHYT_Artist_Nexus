@@ -47,6 +47,42 @@ export type Database = {
         }
         Relationships: []
       }
+      contracts: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          signature_name: string | null
+          signed_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          signature_name?: string | null
+          signed_at?: string | null
+          status: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          signature_name?: string | null
+          signed_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       gallery_photos: {
         Row: {
           created_at: string
