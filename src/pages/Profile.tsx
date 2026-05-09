@@ -226,36 +226,36 @@ const Profile = () => {
           <div className="flex justify-between items-center mb-6 px-4">
             <h2 className="text-2xl font-bold font-serif text-[#1a1a1a]">For this week</h2>
             <button
-              onClick={async () => {
-                for (let i = 0; i < weekPhotos.length; i++) {
-                  const res = await fetch(weekPhotos[i]);
-                  const blob = await res.blob();
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = `for-this-week-${i + 1}.${blob.type.split("/")[1] || "jpg"}`;
-                  document.body.appendChild(a);
-                  a.click();
-                  a.remove();
-                  URL.revokeObjectURL(url);
-                }
-              }}
-              className="bg-[#dcdcdc] px-4 py-1.5 rounded-full text-sm font-semibold text-[#1a1a1a] hover:bg-gray-300 transition-colors font-sans ml-12 flex items-center gap-2"
+              onClick={() => toast({ title: "Viewing all photos" })}
+              className="bg-[#dcdcdc] px-4 py-1.5 rounded-full text-sm font-semibold text-[#1a1a1a] hover:bg-gray-300 transition-colors font-sans ml-12"
             >
-              <Download className="w-4 h-4" /> Download all
+              View all
             </button>
           </div>
-          <div className="flex items-center gap-3 overflow-x-auto pb-2">
-            {weekPhotos.map((img, i) => (
-              <a
-                key={i}
-                href={img}
-                download={`for-this-week-${i + 1}.jpg`}
-                className="shrink-0 w-[120px] h-[150px] rounded-2xl overflow-hidden shadow-md block"
-              >
-                <img src={img} alt={`Week photo ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform" />
-              </a>
-            ))}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setWeekIndex((i) => Math.max(0, i - 1))}
+              disabled={weekIndex === 0}
+              className="shrink-0 w-8 h-8 rounded-full bg-[#dcdcdc] hover:bg-gray-300 disabled:opacity-40 flex items-center justify-center transition-colors"
+              aria-label="Previous"
+            >
+              <ChevronLeft className="w-4 h-4 text-[#1a1a1a]" />
+            </button>
+            <div className="flex items-center gap-3 flex-1">
+              {weekPhotos.slice(weekIndex, weekIndex + visibleCount).map((img, i) => (
+                <div key={weekIndex + i} className="shrink-0 w-[120px] h-[150px] rounded-2xl overflow-hidden shadow-md">
+                  <img src={img} alt={`Week photo ${weekIndex + i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform" />
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setWeekIndex((i) => Math.min(weekPhotos.length - visibleCount, i + 1))}
+              disabled={weekIndex >= weekPhotos.length - visibleCount}
+              className="shrink-0 w-8 h-8 rounded-full bg-[#dcdcdc] hover:bg-gray-300 disabled:opacity-40 flex items-center justify-center transition-colors"
+              aria-label="Next"
+            >
+              <ChevronRight className="w-4 h-4 text-[#1a1a1a]" />
+            </button>
           </div>
         </div>
 
