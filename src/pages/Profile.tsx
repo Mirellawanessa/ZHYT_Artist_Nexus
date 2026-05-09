@@ -189,7 +189,7 @@ const Profile = () => {
             </p>
             
             <div className="flex items-start gap-4">
-              <span className="font-bold text-2xl font-serif">Z</span>
+              <img src={nexieLogo} alt="N-EXIE logo" className="w-8 h-8 object-contain" />
               <div className="text-xs text-[#2a2a2a] font-sans space-y-1">
                 <p><span className="font-bold">Program:</span> AI-Operated Human Artist</p>
                 <p><span className="font-bold">Division:</span> N-EXIE Creators</p>
