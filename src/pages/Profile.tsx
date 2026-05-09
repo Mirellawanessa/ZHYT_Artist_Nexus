@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { HeartIcon, SquigglyLineBottom, SquigglyLineTop, SparkBurst } from "@/components/profile/DecorativeSVGs";
+import nexieLogo from "@/assets/nexie-logo.png";
 
 const mockFriends = [
   "https://i.pravatar.cc/150?img=1",
