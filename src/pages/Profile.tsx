@@ -43,6 +43,8 @@ const Profile = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [weekIndex, setWeekIndex] = useState(0);
+  const visibleCount = 4;
   
   const [editNameValue, setEditNameValue] = useState(displayName);
   const [editBioValue, setEditBioValue] = useState(bio);
