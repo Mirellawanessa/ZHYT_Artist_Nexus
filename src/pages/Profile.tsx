@@ -124,21 +124,23 @@ const Profile = () => {
         
         {/* Decorative SVGs */}
         <SquigglyLineTop className="absolute top-[100px] left-[650px] w-64 h-32 opacity-80" />
-        <HeartIcon className="absolute top-[180px] left-[600px] w-20 h-20 opacity-90 -rotate-12" />
         <SquigglyLineBottom className="absolute bottom-[200px] right-[400px] w-32 h-16 opacity-80" />
         <SparkBurst className="absolute top-[500px] right-[150px] w-16 h-16 opacity-80" />
 
         {/* Top Left Profile Card */}
         <div className="absolute top-8 left-8 bg-[#e0e0e0] rounded-[2.5rem] p-8 w-[600px] h-[380px] flex shadow-sm z-10">
           {/* Avatar */}
-          <div className="relative w-[200px] h-[240px] rounded-3xl overflow-hidden border-4 border-white shrink-0 shadow-md bg-white group">
-            <img src={avatarUrl || ""} alt="Avatar" className="w-full h-full object-cover" />
-            <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+          <div className="relative w-[200px] h-[240px] rounded-3xl border-4 border-white shrink-0 shadow-md bg-white group">
+            <HeartIcon className="absolute -top-10 -right-8 w-16 h-16 opacity-90 -rotate-12 z-20 pointer-events-none" />
+            <div className="w-full h-full rounded-2xl overflow-hidden">
+              <img src={avatarUrl || ""} alt="Avatar" className="w-full h-full object-cover" />
+            </div>
+            <label className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
               <span className="text-white font-semibold text-sm">{uploadingAvatar ? "Uploading..." : "Change Photo"}</span>
               <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploadingAvatar} />
             </label>
           </div>
-          
+
           {/* Info */}
           <div className="ml-8 mt-2 flex flex-col w-full">
             {isEditingName ? (
