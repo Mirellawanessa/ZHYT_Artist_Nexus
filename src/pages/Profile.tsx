@@ -143,7 +143,6 @@ const Profile = () => {
         <div className="absolute top-8 left-8 bg-[#e0e0e0] rounded-[2.5rem] p-8 w-[600px] h-[380px] flex shadow-sm z-10">
           {/* Avatar */}
           <div className="relative w-[200px] h-[240px] rounded-3xl border-4 border-white shrink-0 shadow-md bg-white group">
-            <HeartIcon className="absolute -top-10 -right-8 w-16 h-16 opacity-90 -rotate-12 z-20 pointer-events-none" />
             <div className="w-full h-full rounded-2xl overflow-hidden">
               <img src={avatarUrl || ""} alt="Avatar" className="w-full h-full object-cover" />
             </div>
