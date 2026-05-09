@@ -1,11 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
-import { Bell, ChevronLeft, ChevronRight, Play, SkipBack, SkipForward, AlertCircle, Pencil, Check, X } from "lucide-react";
+import { Bell, ChevronLeft, ChevronRight, Play, SkipBack, SkipForward, AlertCircle, Pencil, Check, X, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { HeartIcon, SquigglyLineBottom, SquigglyLineTop, SparkBurst } from "@/components/profile/DecorativeSVGs";
 import nexieLogo from "@/assets/nexie-logo.png";
+import weekPhoto1 from "@/assets/week/photo1.jpg";
+import weekPhoto2 from "@/assets/week/photo2.jpg";
+import weekPhoto3 from "@/assets/week/photo3.png";
+import weekPhoto4 from "@/assets/week/photo4.jpg";
+import weekPhoto5 from "@/assets/week/photo5.png";
+import weekPhoto6 from "@/assets/week/photo6.jpg";
+import weekPhoto7 from "@/assets/week/photo7.png";
+import weekPhoto8 from "@/assets/week/photo8.png";
+import weekPhoto9 from "@/assets/week/photo9.png";
+import weekPhoto10 from "@/assets/week/photo10.png";
+
+const weekPhotos = [weekPhoto1, weekPhoto2, weekPhoto3, weekPhoto4, weekPhoto5, weekPhoto6, weekPhoto7, weekPhoto8, weekPhoto9, weekPhoto10];
 
 const mockFriends = [
   "https://i.pravatar.cc/150?img=1",
@@ -131,7 +143,6 @@ const Profile = () => {
         <div className="absolute top-8 left-8 bg-[#e0e0e0] rounded-[2.5rem] p-8 w-[600px] h-[380px] flex shadow-sm z-10">
           {/* Avatar */}
           <div className="relative w-[200px] h-[240px] rounded-3xl border-4 border-white shrink-0 shadow-md bg-white group">
-            <HeartIcon className="absolute -top-10 -right-8 w-16 h-16 opacity-90 -rotate-12 z-20 pointer-events-none" />
             <div className="w-full h-full rounded-2xl overflow-hidden">
               <img src={avatarUrl || ""} alt="Avatar" className="w-full h-full object-cover" />
             </div>
@@ -188,7 +199,8 @@ const Profile = () => {
               Always learning, always creating. My energy comes from the people I surround myself with. I value honesty, trust, and a good balance between social connection and recharge time. Blue, black, and white that's me. Let's keep growing together.
             </p>
             
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 relative">
+              <HeartIcon className="absolute -top-8 -right-4 w-14 h-14 opacity-90 -rotate-12 pointer-events-none" />
               <img src={nexieLogo} alt="N-EXIE logo" className="w-8 h-8 object-contain" />
               <div className="text-xs text-[#2a2a2a] font-sans space-y-1">
                 <p><span className="font-bold">Program:</span> AI-Operated Human Artist</p>
@@ -211,21 +223,40 @@ const Profile = () => {
         </div>
 
         {/* For this week (Middle Right) */}
-        <div className="absolute top-[200px] right-8 z-10">
+        <div className="absolute top-[200px] right-8 z-10 w-[600px]">
           <div className="flex justify-between items-center mb-6 px-4">
             <h2 className="text-2xl font-bold font-serif text-[#1a1a1a]">For this week</h2>
-            <button className="bg-[#dcdcdc] px-4 py-1.5 rounded-full text-sm font-semibold text-[#1a1a1a] hover:bg-gray-300 transition-colors font-sans ml-12">
-              view all
+            <button
+              onClick={async () => {
+                for (let i = 0; i < weekPhotos.length; i++) {
+                  const res = await fetch(weekPhotos[i]);
+                  const blob = await res.blob();
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `for-this-week-${i + 1}.${blob.type.split("/")[1] || "jpg"}`;
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                  URL.revokeObjectURL(url);
+                }
+              }}
+              className="bg-[#dcdcdc] px-4 py-1.5 rounded-full text-sm font-semibold text-[#1a1a1a] hover:bg-gray-300 transition-colors font-sans ml-12 flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" /> Download all
             </button>
           </div>
-          <div className="flex items-center gap-4">
-            <ChevronLeft className="w-6 h-6 text-[#1a1a1a] cursor-pointer" />
-            {mockGallery.map((img, i) => (
-              <div key={i} className="w-[120px] h-[150px] rounded-2xl overflow-hidden shadow-md">
-                <img src={img} alt={`Gallery ${i}`} className="w-full h-full object-cover" />
-              </div>
+          <div className="flex items-center gap-3 overflow-x-auto pb-2">
+            {weekPhotos.map((img, i) => (
+              <a
+                key={i}
+                href={img}
+                download={`for-this-week-${i + 1}.jpg`}
+                className="shrink-0 w-[120px] h-[150px] rounded-2xl overflow-hidden shadow-md block"
+              >
+                <img src={img} alt={`Week photo ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform" />
+              </a>
             ))}
-            <ChevronRight className="w-6 h-6 text-[#1a1a1a] cursor-pointer" />
           </div>
         </div>
 
