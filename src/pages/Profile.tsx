@@ -6,6 +6,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { HeartIcon, SquigglyLineBottom, SquigglyLineTop, SparkBurst } from "@/components/profile/DecorativeSVGs";
 import nexieLogo from "@/assets/nexie-logo.png";
+import weekPhoto1 from "@/assets/week/photo1.jpg";
+import weekPhoto2 from "@/assets/week/photo2.jpg";
+import weekPhoto3 from "@/assets/week/photo3.png";
+import weekPhoto4 from "@/assets/week/photo4.jpg";
+import weekPhoto5 from "@/assets/week/photo5.png";
+import weekPhoto6 from "@/assets/week/photo6.jpg";
+import weekPhoto7 from "@/assets/week/photo7.png";
+import weekPhoto8 from "@/assets/week/photo8.png";
+import weekPhoto9 from "@/assets/week/photo9.png";
+import weekPhoto10 from "@/assets/week/photo10.png";
+
+const weekPhotos = [weekPhoto1, weekPhoto2, weekPhoto3, weekPhoto4, weekPhoto5, weekPhoto6, weekPhoto7, weekPhoto8, weekPhoto9, weekPhoto10];
 
 const mockFriends = [
   "https://i.pravatar.cc/150?img=1",
