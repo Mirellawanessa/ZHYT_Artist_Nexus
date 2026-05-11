@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, FileText, Download, Edit3, Eye, ShieldCheck, CheckCircle2, Clock } from "lucide-react";
+import { ArrowLeft, Folder, FileText, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,11 +23,10 @@ interface Contract {
 }
 
 const defaultContracts = [
-  { title: "Non-Disclosure Agreement (NDA)", status: "Pending Signature", action: "Review" },
-  { title: "AI-Operated Human Artist Contract", status: "Pending Signature", action: "Review" },
-  { title: "AI Identity Consent Form", status: "Pending Approval", action: "View" },
-  { title: "Digital Signature Authorization", status: "Pending Signature", action: "Sign" },
-  { title: "Welcome & Onboarding Pack", status: "Available", action: "View" },
+  { title: "Primary Contract", status: "Signature pending", action: "view" },
+  { title: "Music Appendix — A.X.S", status: "Signature pending", action: "view" },
+  { title: "Digital Signature Authorization", status: "Signature pending", action: "view" },
+  { title: "NDA", status: "Signature pending", action: "view" },
 ];
 
 const Contracts = () => {
@@ -36,7 +35,6 @@ const Contracts = () => {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [fetching, setFetching] = useState(true);
 
-  // Modal State
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const [showSignModal, setShowSignModal] = useState(false);
   const [signatureName, setSignatureName] = useState("");
@@ -50,7 +48,6 @@ const Contracts = () => {
   useEffect(() => {
     const fetchContracts = async () => {
       if (!user) return;
-      
       const { data, error } = await supabase
         .from("contracts")
         .select("*")
@@ -58,11 +55,8 @@ const Contracts = () => {
         .order("created_at", { ascending: true });
 
       if (error) {
-        console.error("Error fetching contracts:", error);
-        // Fallback for UI se a tabela ainda não tiver sido criada pelo usuário
         setContracts(defaultContracts as any);
-      } else if (data && data.length === 0) {
-        // População de banco automática!
+      } else if (!data || data.length === 0) {
         const initialInserts = defaultContracts.map(c => ({
           user_id: user.id,
           title: c.title,
@@ -70,13 +64,11 @@ const Contracts = () => {
           action: c.action,
         }));
         await supabase.from("contracts").insert(initialInserts);
-        
         const { data: newData } = await supabase
           .from("contracts")
           .select("*")
           .eq("user_id", user.id)
           .order("created_at", { ascending: true });
-        
         setContracts(newData || []);
       } else {
         setContracts(data);
@@ -89,228 +81,132 @@ const Contracts = () => {
 
   if (loading || !user) return null;
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "Pending Signature":
-        return <Edit3 className="w-4 h-4 text-amber-500" />;
-      case "Pending Approval":
-      case "Under Review":
-        return <Clock className="w-4 h-4 text-blue-500" />;
-      case "Available":
-      case "Active":
-      case "Signed":
-        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
-      default:
-        return <FileText className="w-4 h-4 text-muted-foreground" />;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    let colorClass = "bg-muted text-muted-foreground border-border";
-    if (status.includes("Pending")) colorClass = "bg-amber-100 text-amber-800 border-amber-200";
-    if (status.includes("Review") || status.includes("Approval")) colorClass = "bg-blue-100 text-blue-800 border-blue-200";
-    if (status.includes("Signed") || status.includes("Available") || status.includes("Active")) colorClass = "bg-green-100 text-green-800 border-green-200";
-    
-    return (
-      <span className={`inline-flex flex-row items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${colorClass}`}>
-        {getStatusIcon(status)}
-        {status}
-      </span>
-    );
-  };
-
   const handleActionClick = (contract: Contract) => {
-    if (contract.title !== "Welcome & Onboarding Pack") {
-      setSelectedContract(contract);
-      setShowSignModal(true);
-    }
+    setSelectedContract(contract);
+    setShowSignModal(true);
   };
 
   const handleSignContract = async () => {
     if (!signatureName.trim() || !agreedToTerms || !selectedContract) return;
-    
     setIsSigning(true);
     try {
       const today = new Date().toLocaleDateString('pt-BR');
       const newStatus = `Signed on ${today}`;
-      
       const { error } = await supabase
         .from("contracts")
-        .update({ status: newStatus, action: "View" })
+        .update({ status: newStatus, action: "view" })
         .eq("id", selectedContract.id);
-        
       if (error) throw error;
-      
-      setContracts(contracts.map((c) => 
-        c.id === selectedContract.id ? { ...c, status: newStatus, action: "View" } : c
+      setContracts(contracts.map((c) =>
+        c.id === selectedContract.id ? { ...c, status: newStatus, action: "view" } : c
       ));
-      
-      toast.success("Contrato assinado com sucesso!");
+      toast.success("Contract signed successfully!");
       setShowSignModal(false);
       setSignatureName("");
       setAgreedToTerms(false);
       setSelectedContract(null);
     } catch (error) {
-      console.error("Error signing contract:", error);
-      toast.error("Erro ao assinar contrato. Tente novamente.");
+      toast.error("Error signing contract.");
     } finally {
       setIsSigning(false);
     }
   };
 
-  const getActionBtn = (action: string, title: string, contract: Contract) => {
-    let Icon = Eye;
-    let btnClass = "bg-foreground text-background hover:bg-foreground/90";
-    
-    if (action === "Download") {
-      Icon = Download;
-      btnClass = "bg-blue-600 text-white hover:bg-blue-700";
-    } else if (action === "Sign") {
-      Icon = Edit3;
-      btnClass = "bg-emerald-600 text-white hover:bg-emerald-700";
-    }
-
-    const btn = (
-      <button 
-        onClick={() => title !== "Welcome & Onboarding Pack" && handleActionClick(contract)}
-        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors shadow-sm ${btnClass}`}
-      >
-        <Icon className="w-3.5 h-3.5" />
-        {action}
-      </button>
+  const renderContractContent = (title?: string) => {
+    if (!title) return null;
+    if (title.includes("Primary") || title.includes("AI-Operated")) return <AIOperatedContract />;
+    if (title.includes("Music Appendix") || title.includes("A.X.S") || title.includes("Identity")) return <AIIdentityConsentForm />;
+    if (title.includes("Digital Signature")) return <DigitalSignatureAuthorization />;
+    if (title.includes("NDA") || title.includes("Non-Disclosure")) return <NonDisclosureAgreement />;
+    return (
+      <div className="flex items-center justify-center h-full min-h-[400px] bg-muted/30 border border-border text-muted-foreground rounded-md">
+        Content not available.
+      </div>
     );
-
-    if (title === "Welcome & Onboarding Pack") {
-      return (
-        <a href="/welcome-pack.html" target="_blank" rel="noopener noreferrer">
-          {btn}
-        </a>
-      );
-    }
-
-    return btn;
   };
 
-  // Derive overall contract status from the main AI contract
-  const aiContract = contracts.find(c => c.title === "AI-Operated Human Artist Contract");
-  const overallStatus = aiContract ? aiContract.status : "Pending Signature";
-  const isOverallSigned = overallStatus.includes("Signed on");
-
   return (
-    <div className="min-h-screen bg-background p-6 md:p-10">
-      <div className="max-w-5xl mx-auto space-y-10">
-        
-        {/* Top Header */}
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => navigate("/profile")}
-            className="p-2 rounded-full hover:bg-muted cursor-pointer transition-colors border border-border"
-          >
-            <ArrowLeft className="w-5 h-5 text-foreground" />
-          </button>
-          <div className="flex items-center text-sm font-medium text-muted-foreground uppercase tracking-widest gap-2">
-            <span>ZHYT</span>
-            <span className="text-border">—</span>
-            <span>N-EXIE Entertainment</span>
+    <div className="min-h-screen bg-[#ebebeb] font-serif">
+      <div className="max-w-5xl mx-auto px-6 md:px-10 py-8">
+
+        {/* Back button */}
+        <button
+          onClick={() => navigate("/profile")}
+          className="p-2 rounded-full hover:bg-black/5 transition-colors mb-4"
+          aria-label="Back"
+        >
+          <ArrowLeft className="w-5 h-5 text-[#1a1a1a]" />
+        </button>
+
+        {/* Centered folder icon */}
+        <div className="flex justify-center mb-12">
+          <div className="w-20 h-20 rounded-full bg-black flex items-center justify-center shadow-md">
+            <Folder className="w-9 h-9 text-white" fill="white" strokeWidth={1.5} />
           </div>
         </div>
 
-        {/* Content Section */}
-        <div className="space-y-4 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold border border-blue-100 mb-2">
-            <ShieldCheck className="w-4 h-4" />
-            Secure Legal & Documentation Center
-          </div>
-          
-          <h1 className="text-3xl md:text-5xl font-extrabold text-foreground tracking-tight">
-            Contracts & Documents
-          </h1>
-          <p className="text-xl text-muted-foreground font-medium">Secure Legal Documentation Portal</p>
-          
-          <p className="text-muted-foreground leading-relaxed pt-2">
-            This section contains all official contracts, legal documents, and confidential files related to the artist's career within ZHYT and N-EXIE Entertainment. All documents are encrypted, digitally verified, and legally binding.
-          </p>
-        </div>
+        {/* Heading */}
+        <h1 className="text-4xl md:text-5xl font-bold text-[#1a1a1a] mb-6 font-serif">
+          Contracts &amp; Documents
+        </h1>
 
-        {/* Profile Summary Card */}
-        <div className="bg-card border border-border rounded-xl p-5 md:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 max-w-3xl">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-4 w-full">
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Artist</p>
-              <p className="font-bold text-foreground">Ryu Soo-min</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Program</p>
-              <p className="font-medium text-foreground">AI-Operated Human</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Division</p>
-              <p className="font-medium text-foreground">N-EXIE Creators</p>
-            </div>
-            <div 
-              className={`cursor-pointer hover:bg-muted/50 p-2 -m-2 rounded-lg transition-colors ${!isOverallSigned ? 'animate-pulse' : ''}`}
-              onClick={() => {
-                if (aiContract && !isOverallSigned) {
-                  handleActionClick(aiContract);
-                }
-              }}
-            >
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Contract Status</p>
-              <p className={`font-bold flex items-center gap-1 ${isOverallSigned ? "text-emerald-600" : "text-amber-600"}`}>
-                {isOverallSigned ? <CheckCircle2 className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />} 
-                {overallStatus}
-              </p>
-            </div>
-          </div>
-        </div>
+        <p className="text-lg font-bold text-[#4a4a6a] mb-3 font-sans">
+          Secure Legal Documentation Portal
+        </p>
 
-        {/* Table Area */}
-        <div className="space-y-5 max-w-4xl">
-          <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-            Contract Status Dashboard
-          </h2>
-          
-          <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[600px]">
-                <thead className="bg-muted/50 border-b border-border">
-                  <tr>
-                    <th className="py-4 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-[50%]">Document</th>
-                    <th className="py-4 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
-                    <th className="py-4 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">Action</th>
+        <p className="text-[#4a4a6a] leading-relaxed mb-12 max-w-3xl font-sans">
+          This section contains all official contracts, legal documents, and confidential files related to the artist's career within ZHYT and N-EXIE Entertainment. All documents are encrypted, digitally verified, and legally binding.
+        </p>
+
+        {/* Dashboard heading */}
+        <h2 className="text-xl font-bold text-[#1a1a1a] mb-6 font-serif">
+          Contract Status Dashboard
+        </h2>
+
+        {/* Table */}
+        <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-black/5">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-[#8a93b8] text-white">
+              <tr>
+                <th className="py-5 px-8 text-base font-bold font-sans">Document</th>
+                <th className="py-5 px-8 text-base font-bold font-sans text-center">Status</th>
+                <th className="py-5 px-8 text-base font-bold font-sans text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fetching ? (
+                <tr>
+                  <td colSpan={3} className="py-8 text-center text-muted-foreground">Loading...</td>
+                </tr>
+              ) : contracts.map((c, i) => {
+                const signed = c.status?.includes("Signed");
+                return (
+                  <tr key={c.id || i} className={`${i !== contracts.length - 1 ? 'border-b border-gray-200' : ''} hover:bg-gray-50/60 transition-colors`}>
+                    <td className="py-5 px-8">
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-5 h-5 text-[#4a4a6a] shrink-0" />
+                        <span className="text-[#1a1a1a] font-sans">{c.title}</span>
+                      </div>
+                    </td>
+                    <td className="py-5 px-8 text-center">
+                      <span className={`font-sans inline-flex items-center gap-1.5 ${signed ? 'text-emerald-600 font-semibold' : 'text-[#4a4a6a]'}`}>
+                        {signed && <CheckCircle2 className="w-4 h-4" />}
+                        {c.status}
+                      </span>
+                    </td>
+                    <td className="py-5 px-8 text-center">
+                      <button
+                        onClick={() => handleActionClick(c)}
+                        className="font-bold text-[#1a1a1a] hover:underline font-sans"
+                      >
+                        view
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {fetching ? (
-                    <tr>
-                      <td colSpan={3} className="py-8 text-center text-muted-foreground font-medium">Carregando documentos criptografados...</td>
-                    </tr>
-                  ) : contracts.map((c, i) => (
-                    <tr 
-                      key={c.id || i} 
-                      className="hover:bg-muted/30 transition-colors cursor-pointer"
-                      onClick={() => c.title !== "Welcome & Onboarding Pack" && handleActionClick(c)}
-                    >
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-lg bg-background border border-border flex items-center justify-center shrink-0">
-                            <FileText className="w-5 h-5 text-muted-foreground" />
-                          </div>
-                          <span className="font-semibold text-foreground text-sm">{c.title}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        {getStatusBadge(c.status)}
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        {getActionBtn(c.title === "Welcome & Onboarding Pack" ? "View" : c.action, c.title, c)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
 
       </div>
@@ -320,63 +216,38 @@ const Contracts = () => {
           <DialogHeader>
             <DialogTitle>{selectedContract?.title}</DialogTitle>
             <DialogDescription>
-              Por favor, leia atentamente o contrato abaixo antes de assinar.
+              Please read the contract carefully before signing.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="flex-1 overflow-y-auto max-h-[60vh] my-4 rounded-md">
-            {selectedContract?.title === "AI-Operated Human Artist Contract" && <AIOperatedContract />}
-            {selectedContract?.title === "Non-Disclosure Agreement (NDA)" && <NonDisclosureAgreement />}
-            {selectedContract?.title === "AI Identity Consent Form" && <AIIdentityConsentForm />}
-            {selectedContract?.title === "Digital Signature Authorization" && <DigitalSignatureAuthorization />}
-            {![
-              "AI-Operated Human Artist Contract",
-              "Non-Disclosure Agreement (NDA)",
-              "AI Identity Consent Form",
-              "Digital Signature Authorization"
-            ].includes(selectedContract?.title || "") && (
-              <div className="flex items-center justify-center h-full min-h-[400px] bg-muted/30 border border-border text-muted-foreground rounded-md">
-                Conteúdo do contrato não disponível.
-              </div>
-            )}
+            {renderContractContent(selectedContract?.title)}
           </div>
 
-          {!selectedContract?.status.includes("Signed on") ? (
+          {!selectedContract?.status.includes("Signed") ? (
             <DialogFooter className="flex flex-col sm:flex-row gap-4 items-end sm:items-center">
               <div className="flex flex-col gap-3 flex-1 w-full">
                 <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="terms" 
-                    checked={agreedToTerms} 
-                    onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} 
-                  />
-                  <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    Li e concordo com os termos do contrato.
+                  <Checkbox id="terms" checked={agreedToTerms} onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} />
+                  <Label htmlFor="terms" className="text-sm font-medium leading-none">
+                    I have read and agree to the contract terms.
                   </Label>
                 </div>
-                <div className="flex gap-3">
-                  <Input 
-                    placeholder="Digite seu nome completo como assinatura..." 
-                    value={signatureName}
-                    onChange={(e) => setSignatureName(e.target.value)}
-                    className="flex-1"
-                  />
-                </div>
+                <Input
+                  placeholder="Type your full name as signature..."
+                  value={signatureName}
+                  onChange={(e) => setSignatureName(e.target.value)}
+                />
               </div>
-              
-              <Button 
-                onClick={handleSignContract} 
-                disabled={!agreedToTerms || !signatureName.trim() || isSigning}
-                className="w-full sm:w-auto"
-              >
-                {isSigning ? "Assinando..." : "Assinar Contrato"}
+              <Button onClick={handleSignContract} disabled={!agreedToTerms || !signatureName.trim() || isSigning} className="w-full sm:w-auto">
+                {isSigning ? "Signing..." : "Sign Contract"}
               </Button>
             </DialogFooter>
           ) : (
             <DialogFooter>
               <div className="w-full text-center text-sm text-green-700 font-semibold p-4 bg-green-50 rounded-md border border-green-200 flex items-center justify-center gap-2">
                 <CheckCircle2 className="w-5 h-5" />
-                Documento {selectedContract.status.toLowerCase()}
+                Document {selectedContract.status.toLowerCase()}
               </div>
             </DialogFooter>
           )}
