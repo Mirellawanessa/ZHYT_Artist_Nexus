@@ -20,10 +20,13 @@ import friend1 from "@/assets/friends/friend1.png";
 import friend2 from "@/assets/friends/friend2.png";
 import friend3 from "@/assets/friends/friend3.png";
 import friend4 from "@/assets/friends/friend4.png";
+import friend5 from "@/assets/friends/friend5.png";
+import friend6 from "@/assets/friends/friend6.png";
+import friend7 from "@/assets/friends/friend7.png";
 
 const weekPhotos = [weekPhoto1, weekPhoto2, weekPhoto3, weekPhoto4, weekPhoto5, weekPhoto6, weekPhoto7, weekPhoto8, weekPhoto9, weekPhoto10];
 
-const mockFriends = [friend1, friend2, friend3, friend4];
+const mockFriends = [friend1, friend2, friend3, friend4, friend5, friend6, friend7];
 
 const mockGallery = [
   "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
