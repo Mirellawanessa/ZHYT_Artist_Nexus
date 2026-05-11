@@ -201,8 +201,7 @@ const Profile = () => {
               Always learning, always creating. My energy comes from the people I surround myself with. I value honesty, trust, and a good balance between social connection and recharge time. Blue, black, and white that's me. Let's keep growing together.
             </p>
             
-            <div className="flex items-start gap-4 relative">
-              <HeartIcon className="absolute -top-8 -right-4 w-14 h-14 opacity-90 -rotate-12 pointer-events-none" />
+            <div className="flex items-start gap-4">
               <img src={nexieLogo} alt="N-EXIE logo" className="w-8 h-8 object-contain" />
               <div className="text-xs text-[#2a2a2a] font-sans space-y-1">
                 <p><span className="font-bold">Program:</span> AI-Operated Human Artist</p>
@@ -264,7 +263,10 @@ const Profile = () => {
 
         {/* Friends (Center Left) */}
         <div className="absolute top-[440px] left-8 z-10">
-          <h2 className="text-xl font-bold font-serif text-[#1a1a1a] mb-4">Friends</h2>
+          <div className="flex items-center gap-3 mb-4 relative">
+            <h2 className="text-xl font-bold font-serif text-[#1a1a1a]">Friends</h2>
+            <HeartIcon className="w-10 h-10 opacity-90 -rotate-12 pointer-events-none" />
+          </div>
           {/* Decorative squiggly line above friends */}
           <svg viewBox="0 0 100 50" fill="none" className="absolute -top-12 -left-8 w-24 h-12">
             <path d="M0 40 C 20 10, 40 40, 60 10 C 80 40, 100 10, 100 40" stroke="#1a1a1a" strokeWidth="2" fill="none"/>
