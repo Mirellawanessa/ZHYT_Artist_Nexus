@@ -7,6 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 import { HeartIcon, SquigglyLineBottom, SquigglyLineTop, SparkBurst } from "@/components/profile/DecorativeSVGs";
 import nexieLogo from "@/assets/nexie-logo.png";
 import jobsAvatar from "@/assets/jobs-avatar.png";
+import axsCube from "@/assets/axs-cube.png";
+import tiktokIcon from "@/assets/social/tiktok.png";
+import spotifyIcon from "@/assets/social/spotify.png";
+import youtubeIcon from "@/assets/social/youtube.png";
+import instagramIcon from "@/assets/social/instagram.png";
 import weekPhoto1 from "@/assets/week/photo1.jpg";
 import weekPhoto2 from "@/assets/week/photo2.jpg";
 import weekPhoto3 from "@/assets/week/photo3.png";
@@ -144,15 +149,23 @@ const Profile = () => {
 
         {/* Top Left Profile Card */}
         <div className="absolute top-8 left-8 bg-[#e0e0e0] rounded-[2.5rem] p-8 w-[600px] h-[380px] flex shadow-sm z-10">
-          {/* Avatar */}
-          <div className="relative w-[200px] h-[240px] rounded-3xl border-4 border-white shrink-0 shadow-md bg-white group">
-            <div className="w-full h-full rounded-2xl overflow-hidden">
-              <img src={avatarUrl || ""} alt="Avatar" className="w-full h-full object-cover" />
+          {/* Avatar + socials */}
+          <div className="flex flex-col items-center shrink-0">
+            <div className="relative w-[200px] h-[240px] rounded-3xl border-4 border-white shadow-md bg-white group">
+              <div className="w-full h-full rounded-2xl overflow-hidden">
+                <img src={avatarUrl || ""} alt="Avatar" className="w-full h-full object-cover" />
+              </div>
+              <label className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                <span className="text-white font-semibold text-sm">{uploadingAvatar ? "Uploading..." : "Change Photo"}</span>
+                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploadingAvatar} />
+              </label>
             </div>
-            <label className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-              <span className="text-white font-semibold text-sm">{uploadingAvatar ? "Uploading..." : "Change Photo"}</span>
-              <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploadingAvatar} />
-            </label>
+            <div className="flex items-center justify-center gap-3 mt-3">
+              <a href="#" aria-label="TikTok" className="hover:opacity-70 transition-opacity"><img src={tiktokIcon} alt="TikTok" className="w-5 h-5 object-contain" /></a>
+              <a href="#" aria-label="Spotify" className="hover:opacity-70 transition-opacity"><img src={spotifyIcon} alt="Spotify" className="w-5 h-5 object-contain" /></a>
+              <a href="#" aria-label="YouTube" className="hover:opacity-70 transition-opacity"><img src={youtubeIcon} alt="YouTube" className="w-5 h-5 object-contain" /></a>
+              <a href="#" aria-label="Instagram" className="hover:opacity-70 transition-opacity"><img src={instagramIcon} alt="Instagram" className="w-5 h-5 object-contain" /></a>
+            </div>
           </div>
 
           {/* Info */}
@@ -324,8 +337,8 @@ const Profile = () => {
         {/* Audio Player / Center Media (Bottom Center) */}
         <div className="absolute top-[600px] left-[550px] z-10">
           <div className="relative">
-            <div className="w-[400px] h-[250px] rounded-3xl overflow-hidden border-4 border-white shadow-xl bg-gray-200">
-              <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Band" className="w-full h-full object-cover" />
+            <div className="w-[400px] h-[250px] rounded-3xl overflow-hidden border-4 border-white shadow-xl bg-black">
+              <img src={axsCube} alt="A.X.S Cube" className="w-full h-full object-cover" />
             </div>
             
             {/* Controls pill */}
