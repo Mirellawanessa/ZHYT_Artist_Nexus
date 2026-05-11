@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { HeartIcon, SquigglyLineBottom, SquigglyLineTop, SparkBurst } from "@/components/profile/DecorativeSVGs";
 import nexieLogo from "@/assets/nexie-logo.png";
+import jobsAvatar from "@/assets/jobs-avatar.png";
 import weekPhoto1 from "@/assets/week/photo1.jpg";
 import weekPhoto2 from "@/assets/week/photo2.jpg";
 import weekPhoto3 from "@/assets/week/photo3.png";
@@ -201,7 +202,8 @@ const Profile = () => {
               Always learning, always creating. My energy comes from the people I surround myself with. I value honesty, trust, and a good balance between social connection and recharge time. Blue, black, and white that's me. Let's keep growing together.
             </p>
             
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 relative">
+              <HeartIcon className="absolute -top-8 -right-4 w-14 h-14 opacity-90 -rotate-12 pointer-events-none" />
               <img src={nexieLogo} alt="N-EXIE logo" className="w-8 h-8 object-contain" />
               <div className="text-xs text-[#2a2a2a] font-sans space-y-1">
                 <p><span className="font-bold">Program:</span> AI-Operated Human Artist</p>
@@ -263,10 +265,7 @@ const Profile = () => {
 
         {/* Friends (Center Left) */}
         <div className="absolute top-[440px] left-8 z-10">
-          <div className="flex items-center gap-3 mb-4 relative">
-            <h2 className="text-xl font-bold font-serif text-[#1a1a1a]">Friends</h2>
-            <HeartIcon className="w-10 h-10 opacity-90 -rotate-12 pointer-events-none" />
-          </div>
+          <h2 className="text-xl font-bold font-serif text-[#1a1a1a] mb-4">Friends</h2>
           {/* Decorative squiggly line above friends */}
           <svg viewBox="0 0 100 50" fill="none" className="absolute -top-12 -left-8 w-24 h-12">
             <path d="M0 40 C 20 10, 40 40, 60 10 C 80 40, 100 10, 100 40" stroke="#1a1a1a" strokeWidth="2" fill="none"/>
@@ -280,7 +279,7 @@ const Profile = () => {
                 className={`w-14 h-14 rounded-full border-4 border-[#ebebeb] object-cover shadow-sm ${i > 0 ? '-ml-4' : ''}`}
               />
             ))}
-            <span className="ml-4 font-bold text-2xl tracking-widest text-[#1a1a1a]">...</span>
+            <span className="ml-10 font-bold text-2xl tracking-widest text-[#1a1a1a]">...</span>
           </div>
         </div>
 
@@ -352,7 +351,7 @@ const Profile = () => {
           <div className="relative">
             {/* Avatar connected to card */}
             <div className="absolute -left-12 top-4">
-              <img src="https://i.pravatar.cc/150?img=60" alt="Job origin" className="w-8 h-8 rounded-full border-2 border-white shadow-sm" />
+              <img src={jobsAvatar} alt="Job origin" className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover" />
               {/* Connection line */}
               <svg viewBox="0 0 50 100" fill="none" className="absolute top-4 left-4 w-12 h-24 -z-10">
                 <path d="M0 0 V 80 H 50" stroke="#1a1a1a" strokeWidth="1" fill="none" />
