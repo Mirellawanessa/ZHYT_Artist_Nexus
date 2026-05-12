@@ -145,27 +145,17 @@ const DigitalSignatureAuthorization = ({ isSigned = false, signatureName, signed
           </section>
         </div>
 
-        {/* Authorization & Signature */}
-        <section className="pt-10 pb-6 border-t border-slate-200 mt-8">
-          <h3 className="text-xl font-bold mb-8 text-slate-900 text-center">Authorization & Signature</h3>
-          <div className="grid md:grid-cols-2 gap-12 max-w-2xl mx-auto">
-            <div>
-              <p className="font-bold mb-10 text-slate-900">Artist / Signatory</p>
-              <div className="border-b border-slate-400 mb-2"></div>
-              <p className="text-sm text-slate-600 mt-2">Full Name: <span className="font-medium text-slate-900">___________________________</span></p>
-              <p className="text-sm text-slate-600 mt-2">Signature (Digital): __________________</p>
-              <p className="text-sm text-slate-600 mt-2">Date: ________________________________</p>
-            </div>
-            <div>
-              <p className="font-bold mb-10 text-slate-900">N-EXIE Entertainment</p>
-              <div className="border-b border-slate-400 mb-2"></div>
-              <p className="text-sm text-slate-600 mt-2">By: _________________________________</p>
-              <p className="text-sm text-slate-600 mt-2">Name: <span className="font-medium text-slate-900">Henrique Euler</span></p>
-              <p className="text-sm text-slate-600 mt-2">Title: Legal Representative</p>
-              <p className="text-sm text-slate-600 mt-2">Date: ________________________________</p>
-            </div>
-          </div>
-        </section>
+        <SignatureBlock
+          title="Authorization & Signature"
+          artistRoleLabel="Artist / Signatory"
+          companyRoleLabel="N-EXIE Entertainment"
+          companyTitle="Legal Representative"
+          isSigned={isSigned}
+          signatureName={signatureName}
+          signedDate={signedDate}
+          onSign={onSign}
+          isSigning={isSigning}
+        />
       </div>
     </div>
   );
