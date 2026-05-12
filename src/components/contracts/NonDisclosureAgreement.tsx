@@ -1,6 +1,15 @@
 import React from 'react';
+import SignatureBlock from './SignatureBlock';
 
-const NonDisclosureAgreement = () => {
+interface ContractProps {
+  isSigned?: boolean;
+  signatureName?: string | null;
+  signedDate?: string | null;
+  onSign?: (name: string) => void;
+  isSigning?: boolean;
+}
+
+const NonDisclosureAgreement = ({ isSigned = false, signatureName, signedDate, onSign = () => {}, isSigning = false }: ContractProps) => {
   return (
     <div className="bg-[#FAFAFA] text-slate-800 p-8 md:p-12 font-serif rounded-lg shadow-inner max-w-4xl mx-auto border border-slate-200">
       <div className="text-center mb-10 border-b-2 border-slate-300 pb-6">
@@ -89,27 +98,17 @@ const NonDisclosureAgreement = () => {
           </div>
         </section>
 
-        {/* 8. Signatures */}
-        <section className="pt-10 pb-6 border-t border-slate-200 mt-8">
-          <h3 className="text-xl font-bold mb-8 text-slate-900 text-center">8. Signatures</h3>
-          <div className="grid md:grid-cols-2 gap-12 max-w-2xl mx-auto">
-            <div>
-              <p className="font-bold mb-10 text-slate-900">N-EXIE Entertainment</p>
-              <div className="border-b border-slate-400 mb-2"></div>
-              <p className="text-sm text-slate-600">By: ___________________________</p>
-              <p className="text-sm text-slate-600 mt-2">Name: <span className="font-medium text-slate-900">Henrique Euler</span></p>
-              <p className="text-sm text-slate-600 mt-2">Title: Legal Representative</p>
-              <p className="text-sm text-slate-600 mt-2">Date: _________________________</p>
-            </div>
-            <div>
-              <p className="font-bold mb-10 text-slate-900">Receiving Party (Artist)</p>
-              <div className="border-b border-slate-400 mb-2"></div>
-              <p className="text-sm text-slate-600">Signature: ____________________</p>
-              <p className="text-sm text-slate-600 mt-2">Name: <span className="font-medium text-slate-900">Andressa Correia Morais</span></p>
-              <p className="text-sm text-slate-600 mt-2">Date: _________________________</p>
-            </div>
-          </div>
-        </section>
+        <SignatureBlock
+          title="8. Signatures"
+          artistRoleLabel="Receiving Party (Artist)"
+          companyRoleLabel="N-EXIE Entertainment"
+          companyTitle="Legal Representative"
+          isSigned={isSigned}
+          signatureName={signatureName}
+          signedDate={signedDate}
+          onSign={onSign}
+          isSigning={isSigning}
+        />
       </div>
     </div>
   );

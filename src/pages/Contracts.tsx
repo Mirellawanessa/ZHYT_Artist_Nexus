@@ -3,11 +3,7 @@ import { ArrowLeft, Folder, FileText, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import AIOperatedContract from "@/components/contracts/AIOperatedContract";
 import AIIdentityConsentForm from "@/components/contracts/AIIdentityConsentForm";
@@ -20,6 +16,8 @@ interface Contract {
   status: string;
   action: string;
   created_at: string;
+  signed_at?: string | null;
+  signature_name?: string | null;
 }
 
 const defaultContracts = [
@@ -36,9 +34,7 @@ const Contracts = () => {
   const [fetching, setFetching] = useState(true);
 
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
-  const [showSignModal, setShowSignModal] = useState(false);
-  const [signatureName, setSignatureName] = useState("");
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
 
   useEffect(() => {
@@ -83,28 +79,36 @@ const Contracts = () => {
 
   const handleActionClick = (contract: Contract) => {
     setSelectedContract(contract);
-    setShowSignModal(true);
+    setShowModal(true);
   };
 
-  const handleSignContract = async () => {
-    if (!signatureName.trim() || !agreedToTerms || !selectedContract) return;
+  const handleSignContract = async (signatureName: string) => {
+    if (!signatureName.trim() || !selectedContract) return;
     setIsSigning(true);
     try {
+      const now = new Date().toISOString();
       const today = new Date().toLocaleDateString('pt-BR');
       const newStatus = `Signed on ${today}`;
       const { error } = await supabase
         .from("contracts")
-        .update({ status: newStatus, action: "view" })
+        .update({
+          status: newStatus,
+          action: "view",
+          signature_name: signatureName,
+          signed_at: now,
+        })
         .eq("id", selectedContract.id);
       if (error) throw error;
-      setContracts(contracts.map((c) =>
-        c.id === selectedContract.id ? { ...c, status: newStatus, action: "view" } : c
-      ));
+      const updated = {
+        ...selectedContract,
+        status: newStatus,
+        action: "view",
+        signature_name: signatureName,
+        signed_at: now,
+      };
+      setContracts(contracts.map((c) => c.id === selectedContract.id ? updated : c));
+      setSelectedContract(updated);
       toast.success("Contract signed successfully!");
-      setShowSignModal(false);
-      setSignatureName("");
-      setAgreedToTerms(false);
-      setSelectedContract(null);
     } catch (error) {
       toast.error("Error signing contract.");
     } finally {
@@ -112,12 +116,21 @@ const Contracts = () => {
     }
   };
 
-  const renderContractContent = (title?: string) => {
-    if (!title) return null;
-    if (title.includes("Primary") || title.includes("AI-Operated")) return <AIOperatedContract />;
-    if (title.includes("Music Appendix") || title.includes("A.X.S") || title.includes("Identity")) return <AIIdentityConsentForm />;
-    if (title.includes("Digital Signature")) return <DigitalSignatureAuthorization />;
-    if (title.includes("NDA") || title.includes("Non-Disclosure")) return <NonDisclosureAgreement />;
+  const renderContractContent = (contract: Contract | null) => {
+    if (!contract) return null;
+    const title = contract.title;
+    const isSigned = !!contract.signed_at;
+    const props = {
+      isSigned,
+      signatureName: contract.signature_name,
+      signedDate: contract.signed_at,
+      onSign: handleSignContract,
+      isSigning,
+    };
+    if (title.includes("Primary") || title.includes("AI-Operated")) return <AIOperatedContract {...props} />;
+    if (title.includes("Music Appendix") || title.includes("A.X.S") || title.includes("Identity")) return <AIIdentityConsentForm {...props} />;
+    if (title.includes("Digital Signature")) return <DigitalSignatureAuthorization {...props} />;
+    if (title.includes("NDA") || title.includes("Non-Disclosure")) return <NonDisclosureAgreement {...props} />;
     return (
       <div className="flex items-center justify-center h-full min-h-[400px] bg-muted/30 border border-border text-muted-foreground rounded-md">
         Content not available.
@@ -128,8 +141,6 @@ const Contracts = () => {
   return (
     <div className="min-h-screen bg-[#ebebeb] font-serif">
       <div className="max-w-5xl mx-auto px-6 md:px-10 py-8">
-
-        {/* Back button */}
         <button
           onClick={() => navigate("/profile")}
           className="p-2 rounded-full hover:bg-black/5 transition-colors mb-4"
@@ -138,14 +149,12 @@ const Contracts = () => {
           <ArrowLeft className="w-5 h-5 text-[#1a1a1a]" />
         </button>
 
-        {/* Centered folder icon */}
         <div className="flex justify-center mb-12">
           <div className="w-20 h-20 rounded-full bg-black flex items-center justify-center shadow-md">
             <Folder className="w-9 h-9 text-white" fill="white" strokeWidth={1.5} />
           </div>
         </div>
 
-        {/* Heading */}
         <h1 className="text-4xl md:text-5xl font-bold text-[#1a1a1a] mb-6 font-serif">
           Contracts &amp; Documents
         </h1>
@@ -158,12 +167,10 @@ const Contracts = () => {
           This section contains all official contracts, legal documents, and confidential files related to the artist's career within ZHYT and N-EXIE Entertainment. All documents are encrypted, digitally verified, and legally binding.
         </p>
 
-        {/* Dashboard heading */}
         <h2 className="text-xl font-bold text-[#1a1a1a] mb-6 font-serif">
           Contract Status Dashboard
         </h2>
 
-        {/* Table */}
         <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-black/5">
           <table className="w-full text-left border-collapse">
             <thead className="bg-[#8a93b8] text-white">
@@ -199,7 +206,7 @@ const Contracts = () => {
                         onClick={() => handleActionClick(c)}
                         className="font-bold text-[#1a1a1a] hover:underline font-sans"
                       >
-                        view
+                        {signed ? "view" : "sign"}
                       </button>
                     </td>
                   </tr>
@@ -208,10 +215,9 @@ const Contracts = () => {
             </tbody>
           </table>
         </div>
-
       </div>
 
-      <Dialog open={showSignModal} onOpenChange={setShowSignModal}>
+      <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="max-w-4xl w-full max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{selectedContract?.title}</DialogTitle>
@@ -220,37 +226,9 @@ const Contracts = () => {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto max-h-[60vh] my-4 rounded-md">
-            {renderContractContent(selectedContract?.title)}
+          <div className="flex-1 overflow-y-auto max-h-[70vh] my-4 rounded-md">
+            {renderContractContent(selectedContract)}
           </div>
-
-          {!selectedContract?.status.includes("Signed") ? (
-            <DialogFooter className="flex flex-col sm:flex-row gap-4 items-end sm:items-center">
-              <div className="flex flex-col gap-3 flex-1 w-full">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="terms" checked={agreedToTerms} onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} />
-                  <Label htmlFor="terms" className="text-sm font-medium leading-none">
-                    I have read and agree to the contract terms.
-                  </Label>
-                </div>
-                <Input
-                  placeholder="Type your full name as signature..."
-                  value={signatureName}
-                  onChange={(e) => setSignatureName(e.target.value)}
-                />
-              </div>
-              <Button onClick={handleSignContract} disabled={!agreedToTerms || !signatureName.trim() || isSigning} className="w-full sm:w-auto">
-                {isSigning ? "Signing..." : "Sign Contract"}
-              </Button>
-            </DialogFooter>
-          ) : (
-            <DialogFooter>
-              <div className="w-full text-center text-sm text-green-700 font-semibold p-4 bg-green-50 rounded-md border border-green-200 flex items-center justify-center gap-2">
-                <CheckCircle2 className="w-5 h-5" />
-                Document {selectedContract.status.toLowerCase()}
-              </div>
-            </DialogFooter>
-          )}
         </DialogContent>
       </Dialog>
     </div>

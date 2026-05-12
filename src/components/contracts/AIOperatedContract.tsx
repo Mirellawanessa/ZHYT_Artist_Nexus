@@ -1,6 +1,15 @@
 import React from 'react';
+import SignatureBlock from './SignatureBlock';
 
-const AIOperatedContract = () => {
+interface ContractProps {
+  isSigned?: boolean;
+  signatureName?: string | null;
+  signedDate?: string | null;
+  onSign?: (name: string) => void;
+  isSigning?: boolean;
+}
+
+const AIOperatedContract = ({ isSigned = false, signatureName, signedDate, onSign = () => {}, isSigning = false }: ContractProps) => {
   return (
     <div className="bg-[#FAFAFA] text-slate-800 p-8 md:p-12 font-serif rounded-lg shadow-inner max-w-4xl mx-auto border border-slate-200">
       <div className="text-center mb-10 border-b-2 border-slate-300 pb-6">
@@ -281,25 +290,17 @@ const AIOperatedContract = () => {
         </section>
 
         {/* Signature Section */}
-        <section className="pt-10 pb-6">
-          <h3 className="text-xl font-bold mb-8 text-slate-900 text-center">21. Signatures</h3>
-          <div className="grid md:grid-cols-2 gap-12 max-w-2xl mx-auto">
-            <div>
-              <p className="font-bold mb-10 text-slate-900">N-EXIE Entertainment Pte. Ltd.</p>
-              <div className="border-b border-slate-400 mb-2"></div>
-              <p className="text-sm text-slate-600">By: <span className="font-medium text-slate-900">Henrique Euler</span></p>
-              <p className="text-sm text-slate-600">Title: Legal Representative</p>
-              <p className="text-sm text-slate-600 mt-4">Date: _________________________</p>
-            </div>
-            <div>
-              <p className="font-bold mb-10 text-slate-900">Artist</p>
-              <div className="border-b border-slate-400 mb-2"></div>
-              <p className="text-sm text-slate-600">Signature: ____________________</p>
-              <p className="text-sm text-slate-600">Name: <span className="font-medium text-slate-900">Andressa Correia Morais</span></p>
-              <p className="text-sm text-slate-600 mt-4">Date: _________________________</p>
-            </div>
-          </div>
-        </section>
+        <SignatureBlock
+          title="21. Signatures"
+          artistRoleLabel="Artist"
+          companyRoleLabel="N-EXIE Entertainment Pte. Ltd."
+          companyTitle="Legal Representative"
+          isSigned={isSigned}
+          signatureName={signatureName}
+          signedDate={signedDate}
+          onSign={onSign}
+          isSigning={isSigning}
+        />
 
         {/* APPENDIX */}
         <section className="mt-16 pt-12 border-t border-slate-300">

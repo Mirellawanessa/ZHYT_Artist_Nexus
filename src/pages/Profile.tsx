@@ -29,6 +29,7 @@ import friend4 from "@/assets/friends/friend4.png";
 import friend5 from "@/assets/friends/friend5.png";
 import friend6 from "@/assets/friends/friend6.png";
 import friend7 from "@/assets/friends/friend7.png";
+import folderIcon from "@/assets/folder-icon.png";
 
 const weekPhotos = [weekPhoto1, weekPhoto2, weekPhoto3, weekPhoto4, weekPhoto5, weekPhoto6, weekPhoto7, weekPhoto8, weekPhoto9, weekPhoto10];
 
@@ -47,7 +48,7 @@ const Profile = () => {
   
   const [displayName, setDisplayName] = useState("Soo-min | 류수민");
   const [bio, setBio] = useState("Curious by nature, an artist at heart. 🎨");
-  const [avatarUrl, setAvatarUrl] = useState<string | null>("https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
@@ -152,8 +153,12 @@ const Profile = () => {
           {/* Avatar + socials */}
           <div className="flex flex-col items-center shrink-0">
             <div className="relative w-[200px] h-[240px] rounded-3xl border-4 border-white shadow-md bg-white group">
-              <div className="w-full h-full rounded-2xl overflow-hidden">
-                <img src={avatarUrl || ""} alt="Avatar" className="w-full h-full object-cover" />
+              <div className="w-full h-full rounded-2xl overflow-hidden bg-gray-200 flex items-center justify-center">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-gray-400 text-xs text-center px-2 font-sans">Click to add photo</span>
+                )}
               </div>
               <label className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                 <span className="text-white font-semibold text-sm">{uploadingAvatar ? "Uploading..." : "Change Photo"}</span>
@@ -310,9 +315,8 @@ const Profile = () => {
             <div className="absolute left-4 top-4 bottom-8 w-0.5 bg-[#1a1a1a]"></div>
 
             {/* Folder icon origin */}
-            <div className="absolute left-0 top-0 w-8 h-8 bg-[#f5f5f5] rounded-lg border-2 border-[#1a1a1a] flex items-center justify-center shadow-sm z-10">
-              <div className="w-2 h-0.5 bg-[#1a1a1a] rounded-full mr-1"></div>
-              <div className="w-2 h-0.5 bg-[#1a1a1a] rounded-full"></div>
+            <div className="absolute left-0 top-0 w-8 h-8 flex items-center justify-center z-10">
+              <img src={folderIcon} alt="Folder" className="w-full h-full object-contain" />
             </div>
 
             <div className="space-y-6 pt-4">
@@ -342,18 +346,18 @@ const Profile = () => {
             </div>
             
             {/* Controls pill */}
-            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-[#2a2a2a] rounded-full py-3 px-8 w-[80%] flex items-center justify-between shadow-lg">
-              <SkipBack className="w-5 h-5 text-white cursor-pointer" />
-              <div className="flex flex-col items-center">
-                <span className="text-white text-xs font-bold tracking-widest font-sans mb-1">CHAOS</span>
-                <div className="w-20 h-1 bg-gray-600 rounded-full overflow-hidden">
-                  <div className="w-1/2 h-full bg-white rounded-full"></div>
+            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-[#2a2a2a] rounded-3xl py-4 px-8 w-[80%] flex flex-col items-center gap-3 shadow-lg">
+              <span className="text-white text-xs font-bold tracking-widest font-sans">CHAOS</span>
+              <div className="w-full h-1 bg-gray-600 rounded-full overflow-hidden">
+                <div className="w-1/2 h-full bg-white rounded-full"></div>
+              </div>
+              <div className="flex items-center justify-center gap-8">
+                <SkipBack className="w-5 h-5 text-white cursor-pointer" />
+                <div className="w-8 h-8 rounded-full border border-white flex items-center justify-center cursor-pointer">
+                  <Play className="w-4 h-4 text-white ml-0.5" />
                 </div>
+                <SkipForward className="w-5 h-5 text-white cursor-pointer" />
               </div>
-              <div className="w-6 h-6 rounded-full border border-white flex items-center justify-center cursor-pointer">
-                <Play className="w-3 h-3 text-white ml-0.5" />
-              </div>
-              <SkipForward className="w-5 h-5 text-white cursor-pointer" />
             </div>
           </div>
         </div>
