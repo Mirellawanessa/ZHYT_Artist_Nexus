@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
+import SignatureBlock from './SignatureBlock';
 
-const AIIdentityConsentForm = () => {
+interface ContractProps {
+  isSigned?: boolean;
+  signatureName?: string | null;
+  signedDate?: string | null;
+  onSign?: (name: string) => void;
+  isSigning?: boolean;
+}
+
+const AIIdentityConsentForm = ({ isSigned = false, signatureName, signedDate, onSign = () => {}, isSigning = false }: ContractProps) => {
   const [auth, setAuth] = useState({
     face: null as string | null,
     voice: null as string | null,
@@ -140,27 +149,17 @@ const AIIdentityConsentForm = () => {
           <p className="text-slate-700">This Agreement shall be governed by the laws of Singapore.</p>
         </section>
 
-        {/* 8. Signatures */}
-        <section className="pt-10 pb-6 border-t border-slate-200 mt-8">
-          <h3 className="text-xl font-bold mb-8 text-slate-900 text-center">8. Signatures</h3>
-          <div className="grid md:grid-cols-2 gap-12 max-w-2xl mx-auto">
-            <div>
-              <p className="font-bold mb-10 text-slate-900">Participant (Artist)</p>
-              <div className="border-b border-slate-400 mb-2"></div>
-              <p className="text-sm text-slate-600">Signature: ____________________</p>
-              <p className="text-sm text-slate-600 mt-2">Name: <span className="font-medium text-slate-900">Andressa Correia Morais</span></p>
-              <p className="text-sm text-slate-600 mt-2">Date: _________________________</p>
-            </div>
-            <div>
-              <p className="font-bold mb-10 text-slate-900">Authorized Representative</p>
-              <div className="border-b border-slate-400 mb-2"></div>
-              <p className="text-sm text-slate-600">By: ___________________________</p>
-              <p className="text-sm text-slate-600 mt-2">Name: <span className="font-medium text-slate-900">Henrique Euler</span></p>
-              <p className="text-sm text-slate-600 mt-2">Title: Legal Representative (N-EXIE Entertainment)</p>
-              <p className="text-sm text-slate-600 mt-2">Date: _________________________</p>
-            </div>
-          </div>
-        </section>
+        <SignatureBlock
+          title="8. Signatures"
+          artistRoleLabel="Participant (Artist)"
+          companyRoleLabel="Authorized Representative (N-EXIE Entertainment)"
+          companyTitle="Legal Representative"
+          isSigned={isSigned}
+          signatureName={signatureName}
+          signedDate={signedDate}
+          onSign={onSign}
+          isSigning={isSigning}
+        />
       </div>
     </div>
   );

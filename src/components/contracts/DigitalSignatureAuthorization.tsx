@@ -1,6 +1,15 @@
 import React from 'react';
+import SignatureBlock from './SignatureBlock';
 
-const DigitalSignatureAuthorization = () => {
+interface ContractProps {
+  isSigned?: boolean;
+  signatureName?: string | null;
+  signedDate?: string | null;
+  onSign?: (name: string) => void;
+  isSigning?: boolean;
+}
+
+const DigitalSignatureAuthorization = ({ isSigned = false, signatureName, signedDate, onSign = () => {}, isSigning = false }: ContractProps) => {
   return (
     <div className="bg-[#FAFAFA] text-slate-800 p-8 md:p-12 font-serif rounded-lg shadow-inner max-w-4xl mx-auto border border-slate-200">
       <div className="text-center mb-10 border-b-2 border-slate-300 pb-6">
