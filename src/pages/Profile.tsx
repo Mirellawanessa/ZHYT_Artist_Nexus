@@ -58,6 +58,24 @@ const Profile = () => {
   
   const [editNameValue, setEditNameValue] = useState(displayName);
   const [editBioValue, setEditBioValue] = useState(bio);
+  const [friends, setFriends] = useState<{ id: string; avatar_url: string | null; display_name: string }[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("user_id, avatar_url, display_name")
+        .neq("user_id", user.id);
+      if (data) {
+        setFriends(
+          data
+            .filter((p) => p.avatar_url)
+            .map((p) => ({ id: p.user_id, avatar_url: p.avatar_url, display_name: p.display_name }))
+        );
+      }
+    })();
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user) navigate("/");
