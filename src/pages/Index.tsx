@@ -25,12 +25,6 @@ const Index = () => {
         toast({ title: "Account created! Check your email to confirm." });
       }
     } else {
-      if (email !== "ryu.soomin@zhyt.com" || password !== "ZHYT.rmin.AXS") {
-        toast({ title: "Acesso negado", description: "Estas credenciais não têm permissão para acessar o portal.", variant: "destructive" });
-        setLoading(false);
-        return;
-      }
-
       let { error } = await signIn(email, password);
       
       if (error) {
