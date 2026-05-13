@@ -307,11 +307,12 @@ const Profile = () => {
             <path d="M0 40 C 20 10, 40 40, 60 10 C 80 40, 100 10, 100 40" stroke="#1a1a1a" strokeWidth="2" fill="none"/>
           </svg>
           <div className="flex items-center">
-            {mockFriends.map((friend, i) => (
+            {friends.map((friend, i) => (
               <img 
-                key={i} 
-                src={friend} 
-                alt={`Friend ${i}`} 
+                key={friend.id} 
+                src={friend.avatar_url!} 
+                alt={friend.display_name} 
+                title={friend.display_name}
                 className={`w-14 h-14 rounded-full border-4 border-[#ebebeb] object-cover shadow-sm ${i > 0 ? '-ml-4' : ''}`}
               />
             ))}
