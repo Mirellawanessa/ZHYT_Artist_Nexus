@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, LogIn } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
@@ -16,123 +15,64 @@ const Index = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    if (isSignUp) {
-      const { error } = await signUp(email, password);
-      if (error) {
-        toast({ title: error.message, variant: "destructive" });
-      } else {
-        toast({ title: "Account created! Check your email to confirm." });
-      }
-    } else {
-      let { error } = await signIn(email, password);
-      
-      if (error) {
-        // Se der erro de login (provavelmente usuário não existe), tenta criar a conta
-        const signUpRes = await signUp(email, password);
-        if (!signUpRes.error) {
-          toast({ title: "Conta registrada com sucesso! Fazendo login..." });
-          // Tenta logar de novo
-          const signInRes = await signIn(email, password);
-          error = signInRes.error;
-        } else {
-          error = signUpRes.error;
-        }
-      }
-
-      if (error) {
-        toast({ title: String(error.message || "Erro desconhecido"), variant: "destructive" });
-      } else {
-        navigate("/welcome");
-      }
+    let { error } = await signIn(email, password);
+    if (error) {
+      const r = await signUp(email, password);
+      if (!r.error) {
+        const re = await signIn(email, password);
+        error = re.error;
+      } else { error = r.error; }
     }
+    if (error) toast({ title: String(error.message), variant: "destructive" });
+    else navigate("/welcome");
     setLoading(false);
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Left Section */}
-      <div className="flex-1 flex flex-col px-8 py-6 relative">
-        <h1 className="text-lg font-bold tracking-tight text-foreground">ZHYT Artist Nexus</h1>
-        <div className="absolute left-16 top-24 bottom-48 w-px bg-foreground/20" />
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Decorative lilac blob */}
+      <div className="absolute top-0 left-0 w-64 h-64 rounded-full bg-primary-soft -translate-x-1/3 -translate-y-1/3" aria-hidden />
 
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-foreground mb-12 text-center">
-            Where Stars Connect<br />and Legends Begin.
-          </h2>
+      <header className="px-6 pt-6 relative z-10">
+        <p className="text-xs font-semibold tracking-tight">ZHYT. Artist Nexus</p>
+      </header>
 
-          <form onSubmit={handleSubmit} className="border border-foreground/20 rounded-2xl p-8 w-full max-w-lg">
-            <div className="space-y-6">
-              <div>
-                <label className="flex items-center gap-2 text-sm text-foreground mb-2">
-                  <Mail className="h-4 w-4" /> Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full h-12 rounded-full border-2 px-4 text-sm bg-background text-foreground focus:outline-none"
-                  style={{ borderColor: "hsl(270, 50%, 90%)" }}
-                />
-              </div>
-              <div>
-                <label className="flex items-center gap-2 text-sm text-foreground mb-2">
-                  <Lock className="h-4 w-4" /> Password
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  className="w-full h-12 rounded-full border-2 px-4 text-sm bg-background text-foreground focus:outline-none"
-                  style={{ borderColor: "hsl(270, 50%, 90%)" }}
-                />
-              </div>
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-14 rounded-full text-lg font-semibold text-foreground transition-colors disabled:opacity-50"
-                  style={{ backgroundColor: "hsl(220, 30%, 90%)" }}
-                >
-                  {loading ? "Loading..." : isSignUp ? "Create Account" : "Access Portal"}
-                </button>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                This is an invite-only platform. If you don't have credentials, contact{" "}
-                <span style={{ color: "hsl(270, 50%, 70%)" }} className="cursor-pointer">ZHYT</span> to request access.
-              </p>
-            </div>
-          </form>
-
-          <div className="mt-8 text-center">
-            <p className="text-sm font-mono text-foreground tracking-widest">ZHYT — N-EXIE Entertainment</p>
-            <p className="text-xs text-muted-foreground mt-1">Private and Confidential Platform · All communications are encrypted and protected</p>
-            <p className="text-xs text-muted-foreground">© N-EXIE Entertainment. All rights reserved.</p>
+      <main className="flex-1 flex flex-col justify-center max-w-md w-full mx-auto px-8 pb-12 relative z-10">
+        <h1 className="text-3xl font-serif font-bold mb-8">Login</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center gap-2 bg-muted/60 rounded-full px-4 py-3">
+            <Mail className="w-4 h-4 text-muted-foreground" />
+            <input
+              type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              className="bg-transparent flex-1 outline-none text-sm placeholder:text-muted-foreground"
+            />
           </div>
-        </div>
-      </div>
-
-      {/* Right Section - N-EXIE between lines */}
-      <div className="hidden lg:block w-48 relative">
-        {/* 4 vertical lines evenly spaced */}
-        <div className="absolute inset-y-0 left-0 w-px bg-foreground" />
-        <div className="absolute inset-y-0 left-1/3 w-px bg-foreground" />
-        <div className="absolute inset-y-0 left-2/3 w-px bg-foreground" />
-        <div className="absolute inset-y-0 right-0 w-px bg-foreground" />
-
-        {/* N-EXIE text centered vertically, each pair between lines */}
-        <div className="absolute inset-0 flex items-center z-10">
-          <div className="w-full flex text-5xl font-serif text-foreground">
-            <span className="flex-1 text-center">N-</span>
-            <span className="flex-1 text-center">EX</span>
-            <span className="flex-1 text-center">IE</span>
+          <div className="flex items-center gap-2 bg-muted/60 rounded-full px-4 py-3">
+            <Lock className="w-4 h-4 text-muted-foreground" />
+            <input
+              type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="bg-transparent flex-1 outline-none text-sm placeholder:text-muted-foreground"
+            />
+            <button type="button" className="text-[11px] font-semibold text-muted-foreground hover:text-foreground">FORGOT</button>
           </div>
-        </div>
-      </div>
+
+          <div className="flex justify-center pt-12">
+            <button
+              type="submit" disabled={loading}
+              className="bg-primary text-primary-foreground rounded-full px-8 py-3 font-semibold flex items-center gap-2 shadow-md hover:opacity-90 active:scale-95 transition disabled:opacity-50"
+            >
+              {loading ? "Loading..." : "Login"} <LogIn className="w-4 h-4" />
+            </button>
+          </div>
+        </form>
+
+        <footer className="mt-16 text-center text-[11px] text-muted-foreground">
+          <p>ZHYT — N-EXIE Entertainment</p>
+          <p className="mt-1">Private and Confidential · All communications are encrypted and protected</p>
+        </footer>
+      </main>
     </div>
   );
 };
