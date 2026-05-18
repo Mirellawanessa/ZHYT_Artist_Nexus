@@ -20,7 +20,7 @@ const Welcome = () => {
     });
 
     setTimeout(() => setShowSubtext(true), 400 * (lines.length + 1));
-    setTimeout(() => navigate("/profile"), 400 * (lines.length + 3));
+    setTimeout(() => navigate("/home"), 400 * (lines.length + 3));
   }, [navigate]);
 
   return (
