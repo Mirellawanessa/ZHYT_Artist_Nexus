@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import BottomNav from "./BottomNav";
-import IncomingCallListener from "@/components/chat/IncomingCallListener";
 
 interface Props {
   children: ReactNode;
@@ -15,7 +14,7 @@ export default function AppShell({ children, hideNav, className = "" }: Props) {
         {children}
       </main>
       {!hideNav && <BottomNav />}
-      <IncomingCallListener />
     </div>
   );
 }
+

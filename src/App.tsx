@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CallProvider } from "@/components/chat/CallProvider";
+import IncomingCallListener from "@/components/chat/IncomingCallListener";
 import Index from "./pages/Index.tsx";
 import Welcome from "./pages/Welcome.tsx";
 import Profile from "./pages/Profile.tsx";
@@ -25,6 +26,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <CallProvider>
+          <IncomingCallListener />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/welcome" element={<Welcome />} />
